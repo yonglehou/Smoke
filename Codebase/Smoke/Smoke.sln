@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke", "Smoke\Smoke.csproj", "{1A57242B-9AF1-4E4A-8E93-0580C21C26BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke.NetMQ", "Smoke.NetMQ\Smoke.NetMQ.csproj", "{1D25750D-971A-43F3-890C-E62DA8F3561C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke.Sandbox", "Smoke.Sandbox\Smoke.Sandbox.csproj", "{4DE96213-BD9A-4F6B-8734-485F05215402}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A57242B-9AF1-4E4A-8E93-0580C21C26BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A57242B-9AF1-4E4A-8E93-0580C21C26BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A57242B-9AF1-4E4A-8E93-0580C21C26BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A57242B-9AF1-4E4A-8E93-0580C21C26BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D25750D-971A-43F3-890C-E62DA8F3561C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D25750D-971A-43F3-890C-E62DA8F3561C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D25750D-971A-43F3-890C-E62DA8F3561C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D25750D-971A-43F3-890C-E62DA8F3561C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DE96213-BD9A-4F6B-8734-485F05215402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DE96213-BD9A-4F6B-8734-485F05215402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DE96213-BD9A-4F6B-8734-485F05215402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DE96213-BD9A-4F6B-8734-485F05215402}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
