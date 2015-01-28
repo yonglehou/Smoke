@@ -27,10 +27,19 @@ namespace Smoke.NetMQ
             this.receiver = new NetMQReceiver(socket, new BinarySerializer(new BinaryFormatter()));
         }
 
-
-        public IReceiver GetReceiver()
+        public RequestTask Receive()
         {
-            return receiver;
+            return receiver.Receive();
+        }
+
+        public IEnumerator<IReceiver> GetEnumerator()
+        {
+            yield return receiver;
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

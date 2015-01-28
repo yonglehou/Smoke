@@ -1,6 +1,6 @@
 ﻿using NetMQ;
 using NetMQ.Sockets;
-using Smoke.Protocol;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +28,13 @@ namespace Smoke.NetMQ
         }
 
 
-        public Tuple<Message, Action<Message>> Receive()
+        public RequestTask Receive()
         {
             byte[] data = responseSocket.Receive();
             var message = binarySerializer.Deserialize<Message>(data);
             Action<Message> reply = m => responseSocket.Send(binarySerializer.Serialize<Message>(m));
 
-            return new Tuple<Message, Action<Message>>(message, reply);
+            return new RequestTask(message, reply);
         }
     }
 }

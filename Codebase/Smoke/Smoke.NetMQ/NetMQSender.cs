@@ -1,6 +1,5 @@
 ﻿using NetMQ;
 using NetMQ.Sockets;
-using Smoke.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;

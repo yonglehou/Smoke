@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Smoke
 {
-    public interface IRequestHandlerFactory
+    public interface ISenderManager
     {
-        IRequestHandler<object> GetHandler(object obj);
-        IRequestHandler<T> GetHandler<T>();
+        ISender ResolveSender<TSend>();
     }
 }

@@ -1,13 +1,11 @@
-﻿using Smoke.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Smoke
 {
-    public sealed struct RequestTask
+    public struct RequestTask
     {
         public readonly Message Request;
         public readonly Action<Message> ResponseAction;

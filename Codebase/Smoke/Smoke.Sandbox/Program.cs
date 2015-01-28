@@ -14,9 +14,21 @@ namespace Smoke.Sandbox
         {
             using (var context = NetMQContext.Create())
             {
-                Client client = new Client(new NetMQSenderFactory(context), new ClientMessageFactory());
+                var messageFactory = new MessageFactory();
+                var messageHandler = MessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
 
-                var response = client.Send<int, int>(10);
+                Server server = new Server(messageFactory, new NetMQReceiverManager(context), messageHandler);
+                Client client = new Client(new NetMQSenderManager(context), messageFactory);
+
+                var serverTask = Task.Run(() => server.Run());
+
+                int response;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    response = client.Send<int, RandomNumberRequest>(new RandomNumberRequest() { Min = 10, Max = 100 });
+                    Console.WriteLine(response);
+                }
             }
         }
     }

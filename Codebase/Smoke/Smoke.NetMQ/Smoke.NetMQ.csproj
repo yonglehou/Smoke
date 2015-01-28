@@ -45,17 +45,17 @@
     <Compile Include="NetMQReceiver.cs" />
     <Compile Include="NetMQReceiverManager.cs" />
     <Compile Include="NetMQSender.cs" />
-    <Compile Include="NetMQSenderFactory.cs" />
+    <Compile Include="NetMQSenderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Smoke\Smoke.csproj">
       <Project>{1a57242b-9af1-4e4a-8e93-0580c21c26bd}</Project>
       <Name>Smoke</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

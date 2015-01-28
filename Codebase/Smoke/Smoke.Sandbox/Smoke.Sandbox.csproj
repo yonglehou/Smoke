@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomNumberRequest.cs" />
+    <Compile Include="RandomNumberRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

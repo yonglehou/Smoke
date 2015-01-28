@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Smoke.Protocol
+namespace Smoke.Sandbox
 {
     [Serializable]
     [ImmutableObject(true)]
-    public abstract class Message
+    public class RandomNumberRequest
     {
+        public int Min;
+        public int Max;
     }
 }

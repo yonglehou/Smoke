@@ -1,20 +1,20 @@
-﻿using Smoke.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smoke
 {
     public class Server : IServer
     {
-        private readonly IServerMessageFactory messageFactory;
+        private readonly IMessageFactory messageFactory;
         private readonly IReceiverManager receiverManager;
-        private readonly IRequestHandlerFactory requestHandlerFactory;
+        private readonly IMessageHandler messageHandler;
 
 
-        public Server(IServerMessageFactory messageFactory, IReceiverManager receiverManager, IRequestHandlerFactory requestHandlerFactory)
+        public Server(IMessageFactory messageFactory, IReceiverManager receiverManager, IMessageHandler messageHandler)
         {
             if (messageFactory == null)
                 throw new ArgumentNullException("IMessageFactory");
@@ -22,36 +22,31 @@ namespace Smoke
             if (receiverManager == null)
                 throw new ArgumentNullException("IReceiverManager");
 
-            if (requestHandlerFactory == null)
+            if (messageHandler == null)
                 throw new ArgumentNullException("IRequestHandlerFactory");
 
             this.messageFactory = messageFactory;
             this.receiverManager = receiverManager;
-            this.requestHandlerFactory = requestHandlerFactory;
+            this.messageHandler = messageHandler;
         }
 
 
         public void Run()
         {
-            IReceiver receiver = receiverManager.GetReceiver();
-
             while (true)
             {
-                HandleMessage(receiver.Receive());
-                var requestMessage = task.Item1;
-                var messageHandler = messageFactory.CreateHandler(requestMessage);
-                var request = messageHandler.HandleMessage<object>(requestMessage);
-                var requestHandler = requestHandlerFactory.GetHandler(request);
-                var response = requestHandler.Handle(request);
-                var responseMessage = messageHandler.CreateMessage<object>(response);
-                task.Item2(responseMessage);
+                var task = receiverManager.Receive();
+                Respond(task.Request, task.ResponseAction);
+                Thread.Yield();
             }
         }
 
 
-        public void HandleMessage(RequestTask requestTask)
+        public void Respond(Message requestMessage, Action<Message> respondAction)
         {
-
+            var request = messageFactory.ExtractRequest(requestMessage);
+            var responseMessage = messageHandler.Handle(request, messageFactory);
+            respondAction(responseMessage);
         }
     }
 }

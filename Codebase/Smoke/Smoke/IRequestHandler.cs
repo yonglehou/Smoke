@@ -1,13 +1,13 @@
-﻿using Smoke.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Smoke
 {
-    public interface IRequestHandler
+    public interface IRequestHandler<TRequest, TResponse>
     {
-        Message Handle(Message request, IServerMessageFactory messageFactory);
+        TResponse Handle(TRequest request);
     }
 }

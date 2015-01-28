@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Smoke.NetMQ
 {
-    public class NetMQSenderFactory : ISenderFactory
+    public class NetMQSenderManager : ISenderManager
     {
         private readonly NetMQContext context;
         private readonly NetMQSender sender;
 
 
-        public NetMQSenderFactory(NetMQContext context)
+        public NetMQSenderManager(NetMQContext context)
         {
             if (context == null)
                 throw new ArgumentNullException("NetMQContext");

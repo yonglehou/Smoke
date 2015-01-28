@@ -8,6 +8,6 @@ namespace Smoke
 {
     public interface IClient
     {
-        TReturn Send<TSend, TReturn>(TSend obj);
+        TResponse Send<TResponse, TRequest>(TRequest obj);
     }
 }

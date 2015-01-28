@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Smoke
 {
-    public interface IReceiverManager
+    public interface IReceiverManager : IEnumerable<IReceiver>
     {
-        IReceiver GetReceiver();
+        RequestTask Receive();
     }
 }

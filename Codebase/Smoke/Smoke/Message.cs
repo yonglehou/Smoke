@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Smoke.Protocol.v1_0
+namespace Smoke
 {
     [Serializable]
     [ImmutableObject(true)]
-    public abstract class Message : Smoke.Protocol.Message
+    public abstract class Message
     {
+        public abstract ProtocolVersion Protocol { get; }
+        public abstract bool IsDataMessage { get; }
     }
 }
