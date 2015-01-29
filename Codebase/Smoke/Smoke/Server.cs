@@ -7,14 +7,36 @@ using System.Threading.Tasks;
 
 namespace Smoke
 {
+    /// <summary>
+    /// Provides basic server functionality to allow clients to connect and dispatches request messages to the IRequestHandler synchronously
+    /// </summary>
     public class Server : IServer
     {
+        /// <summary>
+        /// Stores a readonly reference to an IMessageFactory
+        /// </summary>
         private readonly IMessageFactory messageFactory;
+
+
+        /// <summary>
+        /// Stores a readonly reference to an IReceiverManager
+        /// </summary>
         private readonly IReceiverManager receiverManager;
+
+
+        /// <summary>
+        /// Stores a readonly reference to an IMessageHandler
+        /// </summary>
         private readonly IMessageHandler messageHandler;
 
 
-        public Server(IMessageFactory messageFactory, IReceiverManager receiverManager, IMessageHandler messageHandler)
+        /// <summary>
+        /// Initializes a new instance of a Server composed of the specified IReceiverManager to receive client connections, IMessageFactory to wrap requests in the Smoke message protocol and IMessageHandler to handle incoming messages
+        /// </summary>
+        /// <param name="receiverManager">Manages client connections</param>
+        /// <param name="messageFactory">Wraps requests in the Smoke message protocol</param>
+        /// <param name="messageHandler">Handles incoming messages</param>
+        public Server(IReceiverManager receiverManager, IMessageFactory messageFactory, IMessageHandler messageHandler)
         {
             if (messageFactory == null)
                 throw new ArgumentNullException("IMessageFactory");
@@ -31,21 +53,32 @@ namespace Smoke
         }
 
 
-        public void Run()
+        /// <summary>
+        /// Starts a synchronus call to run the server with the specified CancellationToken to exit the loop
+        /// </summary>
+        public void Run(CancellationToken cancellationToken)
         {
             while (true)
             {
                 var task = receiverManager.Receive();
-                Respond(task.Request, task.ResponseAction);
+                Reply(task.Request, task.ResponseAction);
+
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 Thread.Yield();
             }
         }
 
 
-        public void Respond(Message requestMessage, Action<Message> respondAction)
+        /// <summary>
+        /// Dispatches a response to the specified request Message with the given response action
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <param name="respondAction"></param>
+        public void Reply(Message requestMessage, Action<Message> respondAction)
         {
-            var request = messageFactory.ExtractRequest(requestMessage);
-            var responseMessage = messageHandler.Handle(request, messageFactory);
+            var responseMessage = messageHandler.Handle(requestMessage, messageFactory);
             respondAction(responseMessage);
         }
     }

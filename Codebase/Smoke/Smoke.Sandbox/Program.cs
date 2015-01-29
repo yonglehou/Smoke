@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smoke.Sandbox
@@ -17,10 +18,11 @@ namespace Smoke.Sandbox
                 var messageFactory = new MessageFactory();
                 var messageHandler = MessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
 
-                Server server = new Server(messageFactory, new NetMQReceiverManager(context), messageHandler);
+                Server server = new Server(new NetMQReceiverManager(context), messageFactory, messageHandler);
                 Client client = new Client(new NetMQSenderManager(context), messageFactory);
 
-                var serverTask = Task.Run(() => server.Run());
+                var cancellationTokenSource = new CancellationTokenSource();
+                var serverTask = Task.Run(() => server.Run(cancellationTokenSource.Token));
 
                 int response;
 

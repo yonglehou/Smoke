@@ -42,6 +42,8 @@
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="DataMessage.cs" />
+    <Compile Include="Extensions\MessageExtensions.cs" />
+    <Compile Include="Extensions\SenderMessage.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IMessageFactory.cs" />
     <Compile Include="IReceiver.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="ProtocolVersion.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="RequestTask.cs" />
+    <Compile Include="Extensions\SenderExtension.cs" />
     <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup />
