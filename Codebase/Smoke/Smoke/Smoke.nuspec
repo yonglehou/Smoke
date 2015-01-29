@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Jonathan Higgs</authors>
+    <owners>Jonathan Higgs</owners>
+    <projectUrl>https://github.com/JonathanHiggs/Smoke</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.Net Microservice Actionless Communication Framework</description>
+    <releaseNotes>Pre-release</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>.Net Microservice Actionless Communication Framework Server Client Messaging Protocol</tags>
+  </metadata>
+</package>
