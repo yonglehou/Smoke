@@ -26,7 +26,7 @@ namespace Smoke
         /// <returns>Smoke protocol Message wrapping the response object or object graph</returns>
         public Message CreateRequest<TRequest>(TRequest request)
         {
-            return new DataMessage<TRequest>() { Data = request };
+            return new DataMessage<TRequest>(request);
         }
 
 
@@ -57,7 +57,7 @@ namespace Smoke
         /// <returns>Smoke protocol Message wrapping the response object or object graph</returns>
         public Message CreateResponse<TResponse>(TResponse response)
         {
-            return new DataMessage<TResponse>() { Data = response };
+            return new DataMessage<TResponse>(response);
         }
         
 

@@ -16,7 +16,7 @@ namespace Smoke.Sandbox
             using (var context = NetMQContext.Create())
             {
                 var messageFactory = new MessageFactory();
-                var messageHandler = MessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
+                var messageHandler = DelegateMessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
 
                 Server server = new Server(new NetMQReceiverManager(context), messageFactory, messageHandler);
                 Client client = new Client(new NetMQSenderManager(context), messageFactory);

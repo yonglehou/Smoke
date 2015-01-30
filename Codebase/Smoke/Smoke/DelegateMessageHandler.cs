@@ -18,7 +18,7 @@ namespace Smoke
     /// <summary>
     /// MessageHandlerDelegates are 
     /// </summary>
-    public class MessageHandler : IMessageHandler
+    public class DelegateMessageHandler : IMessageHandler
     {
         /// <summary>
         /// Stores a readonly reference to a Dictionary of Types and RequestHandlerDelegates
@@ -34,7 +34,10 @@ namespace Smoke
         /// <returns>Response Message</returns>
         public Message Handle(Message request, IMessageFactory messageFactory)
         {
-            return requestHandlers[request.GetType()](request, messageFactory);
+            if (request.WrapsObject)
+                return requestHandlers[request.DomainObject.GetType()](request, messageFactory);
+            else
+                return requestHandlers[request.GetType()](request, messageFactory);
         }
 
 
@@ -42,9 +45,9 @@ namespace Smoke
         /// Initializes a new instance of a MessageHandler
         /// </summary>
         /// <returns>Initialized MessageHandler</returns>
-        public static MessageHandler Create()
+        public static DelegateMessageHandler Create()
         {
-            return new MessageHandler();
+            return new DelegateMessageHandler();
         }
 
 
@@ -55,7 +58,7 @@ namespace Smoke
         /// <typeparam name="TResponse">Type of response object or object graph root</typeparam>
         /// <param name="handler">Instance of request handler being registered</param>
         /// <returns>Caller instance of MessageHandler for fluently construction</returns>
-        public MessageHandler Register<TRequest, TResponse>(IRequestHandler<TRequest, TResponse> handler)
+        public DelegateMessageHandler Register<TRequest, TResponse>(IRequestHandler<TRequest, TResponse> handler)
         {
             requestHandlers.Add(typeof(TRequest), (requestMessage, messageFactory) => {
                 var request = messageFactory.ExtractRequest(requestMessage);
