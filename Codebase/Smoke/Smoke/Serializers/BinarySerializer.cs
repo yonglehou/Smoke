@@ -7,7 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Smoke
+namespace Smoke.Serializers
 {
     /// <summary>
     /// Serializes an object or object graph to binary data 

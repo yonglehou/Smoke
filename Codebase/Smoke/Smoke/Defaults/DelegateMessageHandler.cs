@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Smoke
+namespace Smoke.Default
 {
     /// <summary>
     /// Delegate that defines a function for handling a request

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke.NetMQ", "Smoke.NetMQ\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke.Sandbox", "Smoke.Sandbox\Smoke.Sandbox.csproj", "{4DE96213-BD9A-4F6B-8734-485F05215402}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CDB54B0E-EB1C-4060-A703-EA3AA7195717}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smoke.Test", "Smoke.Test\Smoke.Test.csproj", "{0B564D68-E565-47A9-961B-15526C924239}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +31,15 @@ Global
 		{4DE96213-BD9A-4F6B-8734-485F05215402}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DE96213-BD9A-4F6B-8734-485F05215402}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DE96213-BD9A-4F6B-8734-485F05215402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B564D68-E565-47A9-961B-15526C924239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B564D68-E565-47A9-961B-15526C924239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B564D68-E565-47A9-961B-15526C924239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B564D68-E565-47A9-961B-15526C924239}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0B564D68-E565-47A9-961B-15526C924239} = {CDB54B0E-EB1C-4060-A703-EA3AA7195717}
 	EndGlobalSection
 EndGlobal

@@ -8,12 +8,28 @@ using System.Threading.Tasks;
 
 namespace Smoke.NetMQ
 {
+    /// <summary>
+    /// A synchronous implememtation of ISender with a NetMQ.Sockets.RequestSocket to handle network communication
+    /// </summary>
     public class NetMQSender : ISender
     {
+        /// <summary>
+        /// Stores a readonly reference to a binary serializer
+        /// </summary>
         private readonly ISerializer<byte[]> binarySerializer;
+
+
+        /// <summary>
+        /// Stores a readonly reference to a NetMQ.Sockets.RequestSocket
+        /// </summary>
         private readonly RequestSocket requestSocket;
 
 
+        /// <summary>
+        /// Initializes an instance of a NetMQSender with the specified RequestSocket and binary serializer
+        /// </summary>
+        /// <param name="requestSocket"></param>
+        /// <param name="binarySerializer"></param>
         public NetMQSender(RequestSocket requestSocket, ISerializer<byte[]> binarySerializer)
         {
             if (binarySerializer == null)
@@ -27,6 +43,12 @@ namespace Smoke.NetMQ
         }
 
 
+        /// <summary>
+        /// Sends a request message to the connected server and returns the response message, serializing and deserializing the
+        /// request and response for network transport along the way
+        /// </summary>
+        /// <param name="message">Request message</param>
+        /// <returns>Response message</returns>
         public Message Send(Message message)
         {
             byte[] sendData = binarySerializer.Serialize<Message>(message);

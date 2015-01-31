@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Smoke
+namespace Smoke.Default
 {
     /// <summary>
     /// Implements the IMessageFactory interface to wrap and unwrap request and response objects in unextended Smoke protocol Messages
@@ -39,6 +39,10 @@ namespace Smoke
         {
             Type requestMessageType = requestMessage.GetType();
 
+            // If the message typoe if a DataMessage this constructs a typesafe message call to extract the wrapped object
+            // from the message.
+            // Could change this to make a dictionary of calls so that the construction of the call only happens once. Would need
+            // to run some perfomance tests to see which is fastest
             if (requestMessageType.IsGenericType && requestMessageType.GetGenericTypeDefinition() == typeof(DataMessage<>))
             {
                 MethodInfo extractMethod = extractDataMethod.MakeGenericMethod(requestMessageType.GenericTypeArguments[0]);

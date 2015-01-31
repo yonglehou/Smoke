@@ -1,4 +1,5 @@
 ﻿using NetMQ;
+using Smoke.Default;
 using Smoke.NetMQ;
 using System;
 using System.Collections.Generic;

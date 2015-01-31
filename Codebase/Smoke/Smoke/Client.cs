@@ -52,7 +52,7 @@ namespace Smoke
         public TResponse Send<TResponse, TRequest>(TRequest obj)
         {
             return messageFactory.CreateRequest<TRequest>(obj)
-                                 .ResolveSender<TRequest>(senderManager, obj)
+                                 .ResolveSender<TRequest>(senderManager)
                                  .ReceiveFromSender()
                                  .ExtractResponse<TResponse>(messageFactory);
         }

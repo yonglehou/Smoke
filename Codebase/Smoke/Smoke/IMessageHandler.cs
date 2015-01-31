@@ -13,7 +13,7 @@ namespace Smoke
     public interface IMessageHandler
     {
         /// <summary>
-        /// Dispatches the handling of a message
+        /// Dispatches the handling of a Message to receate a response Message
         /// </summary>
         /// <param name="request">Request object or object graph root</param>
         /// <param name="messageFactory">Factory for extracting request and creating response Messages</param>

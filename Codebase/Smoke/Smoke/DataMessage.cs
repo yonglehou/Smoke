@@ -8,16 +8,24 @@ using System.Threading.Tasks;
 namespace Smoke
 {
     /// <summary>
-    /// 
+    /// DataMessage takes a type parameter and wraps it in a message structure so that the framework doesn't need to know anything
+    /// about the type of data it is sending, so long as it is serializable. 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Type of data object to wrap</typeparam>
     [Serializable]
     [ImmutableObject(true)]
     public class DataMessage<T> : Message
     {
+        /// <summary>
+        /// Stores a readonly reference to the data object
+        /// </summary>
         public readonly T Data;
 
 
+        /// <summary>
+        /// Initializes an instance of DataMessage with the specified object or object graph root
+        /// </summary>
+        /// <param name="data">Non-null instance of object or object graph root</param>
         public DataMessage(T data)
             : base()
         {
@@ -28,6 +36,11 @@ namespace Smoke
         }
 
 
+        /// <summary>
+        /// Initializes an instance of DataMessage with the specified object or object graph root and a unique identifier for the message
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="guid"></param>
         public DataMessage(T data, Guid guid)
             : base(guid)
         {
@@ -38,18 +51,24 @@ namespace Smoke
         }
 
 
-        public Type Type
-        { get { return typeof(T); } }
-
-
+        /// <summary>
+        /// Gets a boolean that indicates whether the message wraps an object, always true for DataMessage
+        /// </summary>
         public override bool WrapsObject
         { get { return true; } }
 
 
+        /// <summary>
+        /// Gets an enum that identifies the message protocol version to allow clients and servers to operate multiple and
+        /// seperate protocols and find a suitable common protocol for communication
+        /// </summary>
         public override ProtocolVersion Protocol
-        { get { return ProtocolVersion.v1_0; } }
+        { get { return ProtocolVersion.v0_1; } }
 
 
+        /// <summary>
+        /// Gets the object wrapped by the message should it exist, and null if else
+        /// </summary>
         public override object DomainObject
         { get { return Data; } }
     }
