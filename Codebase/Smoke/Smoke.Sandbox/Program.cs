@@ -19,8 +19,8 @@ namespace Smoke.Sandbox
                 var messageFactory = new MessageFactory();
                 var messageHandler = DelegateMessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
 
-                Server server = new Server(new NetMQReceiverManager(context), messageFactory, messageHandler);
-                Client client = new Client(new NetMQSenderManager(context), messageFactory);
+                Server server = new Server(new NetMQReceiverManager(context, "tcp://127.0.0.1:5556"), messageFactory, messageHandler);
+                Client client = new Client(new NetMQSenderManager(context, "tcp://127.0.0.1:5556"), messageFactory);
 
                 var cancellationTokenSource = new CancellationTokenSource();
                 var serverTask = Task.Run(() => server.Run(cancellationTokenSource.Token));
