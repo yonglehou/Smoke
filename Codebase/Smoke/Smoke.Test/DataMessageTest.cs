@@ -16,6 +16,12 @@ namespace Smoke.Test
 
             AssertException.Throws<ArgumentNullException>(() => new DataMessage<List<DateTime>>(null));
             AssertException.Throws<ArgumentNullException>(() => new DataMessage<List<DateTime>>(null, Guid.NewGuid()));
+
+
+            var dt = DateTime.Now;
+            var message = new DataMessage<DateTime>(dt);
+
+            Assert.AreEqual(dt, message.MessageObject);
         }
 
 

@@ -10,7 +10,7 @@ namespace Smoke.Test.Defaults
     public class MessageFactoryTest
     {
         [TestMethod]
-        public void TestCreateRequest()
+        public void MessageFactory_CreateRequestTest()
         {
             var messageFactory = new MessageFactory();
 
@@ -21,7 +21,7 @@ namespace Smoke.Test.Defaults
         }
 
         [TestMethod]
-        public void TestExtractRequest()
+        public void MessageFactory_ExtractRequestTest()
         {
             var messageFactory = new MessageFactory();
 
@@ -39,7 +39,7 @@ namespace Smoke.Test.Defaults
 
 
         [TestMethod]
-        public void TestCreateResponse()
+        public void MessageFactory_CreateResponseTest()
         {
             var messageFactory = new MessageFactory();
             var response = DateTime.Now;
@@ -51,7 +51,7 @@ namespace Smoke.Test.Defaults
 
 
         [TestMethod]
-        public void TestExtractResponse()
+        public void MessageFactory_ExtractResponse()
         {
             var messageFactory = new MessageFactory();
             var response = DateTime.Now;

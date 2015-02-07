@@ -11,92 +11,75 @@ namespace Smoke.Test.Serializers
     public class BinarySerializerTest
     {
         [TestMethod]
-        public void SerializeInt()
+        public void BinarySerializer_SerializationTest()
         {
-            // Setup
             var random = new Random();
-            var binarySerializer = new BinarySerializer();
 
+            // Check int serialization
+            GenericSerializeTest<int>(() => random.Next(-100, 100));
 
-            for (int i = 0; i < 10; i++)
-            {
-                int randomInt = random.Next(-100, 100);
-                byte[] data = binarySerializer.Serialize<int>(randomInt);
-                int result = binarySerializer.Deserialize<int>(data);
-                Assert.AreEqual(randomInt, result);
-            }
-        }
+            // Check datetime serialization
+            GenericSerializeTest<DateTime>(() => DateTime.Now.AddSeconds(random.Next(-100, 100)));
 
+            // Check string serialization
+            GenericSerializeTest<String>(() => String.Format("{0}", DateTime.Now.AddSeconds(random.Next(-100, 100))));
 
-        [TestMethod]
-        public void SerializeString()
-        {
-            // Setup
-            var random = new Random();
-            var binarySerializer = new BinarySerializer();
-
-
-            for (int i = 0; i < 10; i++)
-            {
-                String randomInt = String.Format("{0} {1}", random.Next(-10000, 10000), DateTime.Now);
-                byte[] data = binarySerializer.Serialize<String>(randomInt);
-                String result = binarySerializer.Deserialize<String>(data);
-                Assert.AreEqual(randomInt, result);
-            }
-        }
-
-
-        [TestMethod]
-        public void SerializeList()
-        {
-            // Setup
-            var random = new Random();
-            var binarySerializer = new BinarySerializer();
-
-            for (int i = 0; i < 10; i++)
+            // Check list serialization
+            GenericSerializeTest<List<int>>(() =>
             {
                 var list = new List<int>();
-                for (int j = 0; j < i; j++)
+                for (int i = 0; i < 10; i++)
                     list.Add(random.Next(-100, 100));
+                return list;
+            }, (expected, actual) =>
+            {
+                for (int i = 0; i < expected.Count; i++)
+                    Assert.AreEqual(expected[i], actual[i]);
+            });
 
-                byte[] data = binarySerializer.Serialize<List<int>>(list);
-                List<int> result = binarySerializer.Deserialize<List<int>>(data);
+            // Check dictionary serialization
+            GenericSerializeTest<Dictionary<Guid, DateTime>>(() =>
+            {
+                var dict = new Dictionary<Guid, DateTime>();
+                for (int i = 0; i < 10; i++)
+                    dict.Add(Guid.NewGuid(), DateTime.Now.AddSeconds(random.Next(-100, 100)));
+                return dict;
+            }, (expected, actual) =>
+            {
+                var expectedEnum = expected.GetEnumerator();
+                var actualEnum = actual.GetEnumerator();
 
-                for (int k = 0; k < result.Count; k++)
-                    Assert.AreEqual(list[k], result[k]);
-            }
+                while (expectedEnum.MoveNext() && actualEnum.MoveNext())
+                {
+                    Assert.AreEqual(expectedEnum.Current.Key, actualEnum.Current.Key);
+                    Assert.AreEqual(expectedEnum.Current.Value, actualEnum.Current.Value);
+                }
+            });
         }
 
 
-        [TestMethod]
-        public void SerializeDictionary()
+        public void GenericSerializeTest<T>(Func<T> makeObject)
         {
-            // Setup
+            GenericSerializeTest(makeObject, (expcted, actual) => Assert.AreEqual(expcted, actual));
+        }
+
+
+        public void GenericSerializeTest<T>(Func<T> makeObject, Action<T, T> checkAction)
+        {
             var binarySerializer = new BinarySerializer();
 
             for (int i = 0; i < 10; i++)
             {
-                var list = new Dictionary<int, Guid>();
-                for (int j = 0; j < i; j++)
-                    list.Add(j, Guid.NewGuid());
-
-                byte[] data = binarySerializer.Serialize<Dictionary<int, Guid>>(list);
-                Dictionary<int, Guid> result = binarySerializer.Deserialize<Dictionary<int, Guid>>(data);
-
-                var listEnum = list.GetEnumerator();
-                var resultEnum = result.GetEnumerator();
-
-                while (listEnum.MoveNext() && resultEnum.MoveNext())
-                {
-                    Assert.AreEqual(listEnum.Current.Key, resultEnum.Current.Key);
-                    Assert.AreEqual(listEnum.Current.Value, resultEnum.Current.Value);
-                }
+                var obj = makeObject();
+                byte[] data = binarySerializer.Serialize<T>(obj);
+                var result = binarySerializer.Deserialize<T>(data);
+                checkAction(obj, result);
             }
         }
 
 
         [TestMethod]
-        public void SerializeObjectGraph()
+        public void BinarySerializer_SerializeObjectGraph()
         {
             // Setup
             var random = new Random();

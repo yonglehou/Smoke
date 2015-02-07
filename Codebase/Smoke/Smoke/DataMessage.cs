@@ -52,21 +52,6 @@ namespace Smoke
 
 
         /// <summary>
-        /// Gets a boolean that indicates whether the message wraps an object, always true for DataMessage
-        /// </summary>
-        public override bool WrapsObject
-        { get { return true; } }
-
-
-        /// <summary>
-        /// Gets an enum that identifies the message protocol version to allow clients and servers to operate multiple and
-        /// seperate protocols and find a suitable common protocol for communication
-        /// </summary>
-        public override ProtocolVersion Protocol
-        { get { return ProtocolVersion.v0_1; } }
-
-
-        /// <summary>
         /// Gets the object wrapped by the message should it exist, and the message itself if not
         /// </summary>
         public override object MessageObject

@@ -51,19 +51,6 @@ namespace Smoke
 
 
         /// <summary>
-        /// Gets an enum that identifies the message protocol version to allow clients and servers to operate multiple and
-        /// seperate protocols and find a suitable common protocol for communication
-        /// </summary>
-        public abstract ProtocolVersion Protocol { get; }
-
-
-        /// <summary>
-        /// Gets a boolean indicating whether the message wraps a domain object
-        /// </summary>
-        public abstract bool WrapsObject { get; }
-
-
-        /// <summary>
         /// Gets the object wrapped by the message should it exist, and the message itself if not
         /// </summary>
         public abstract object MessageObject { get; }

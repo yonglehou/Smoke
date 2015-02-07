@@ -58,12 +58,15 @@
   <ItemGroup>
     <Compile Include="Defaults\DelegateMessageHandlerTest.cs" />
     <Compile Include="Defaults\MessageFactoryTest.cs" />
+    <Compile Include="Defaults\SenderManagerTest.cs" />
     <Compile Include="Serializers\BinarySerializerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerTest.cs" />
     <Compile Include="TestExtensions\AssertException.cs" />
     <Compile Include="ClientTest.cs" />
     <Compile Include="DataMessageTest.cs" />
+    <Compile Include="RequestMessageTest.cs" />
+    <Compile Include="TestRequests\App1.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -75,6 +78,7 @@
       <Name>Smoke</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

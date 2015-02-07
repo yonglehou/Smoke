@@ -34,10 +34,7 @@ namespace Smoke.Default
         /// <returns>Response Message</returns>
         public Message Handle(Message request, IMessageFactory messageFactory)
         {
-            if (request.WrapsObject)
-                return requestHandlers[request.MessageObject.GetType()](request, messageFactory);
-            else
-                return requestHandlers[request.GetType()](request, messageFactory);
+            return requestHandlers[request.MessageObject.GetType()](request, messageFactory);
         }
 
 
