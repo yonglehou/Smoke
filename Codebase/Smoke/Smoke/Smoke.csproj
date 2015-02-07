@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Defaults\SenderManager.cs" />
+    <Compile Include="Default\SenderManager.cs" />
     <Compile Include="Serializers\BinarySerializer.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="DataMessage.cs" />
@@ -56,9 +56,9 @@
     <Compile Include="ISerializer.cs" />
     <Compile Include="IServer.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="Defaults\MessageFactory.cs" />
+    <Compile Include="Default\MessageFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Defaults\DelegateMessageHandler.cs" />
+    <Compile Include="Default\DelegateMessageHandler.cs" />
     <Compile Include="RequestTask.cs" />
     <Compile Include="Server.cs" />
   </ItemGroup>

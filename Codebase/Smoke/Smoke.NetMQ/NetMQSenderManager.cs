@@ -1,5 +1,6 @@
 ﻿using NetMQ;
 using NetMQ.Sockets;
+using Smoke.Default;
 using Smoke.Serializers;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,8 @@ namespace Smoke.NetMQ
     /// synchronously. Probably don't actually use this, but it makes examples very easy to show the functionality of the
     /// framework
     /// </summary>
-    public class NetMQSenderManager : ISenderManager
+    public class NetMQSenderManager : SenderManager
     {
-        /// <summary>
-        /// Stores a readonly reference to a NetMQSender
-        /// </summary>
-        private readonly NetMQSender sender;
-
-
         /// <summary>
         /// Initializes an instance of a NetMQSenderManager constructing a NetMQSender from the specified NetMQContext and
         /// connects it to the specified address
@@ -37,18 +32,10 @@ namespace Smoke.NetMQ
             RequestSocket socket = context.CreateRequestSocket();
             socket.Connect(address);
 
-            sender = new NetMQSender(socket, new BinarySerializer());
-        }
+            var sender = new NetMQSender(socket, new BinarySerializer());
 
-
-        /// <summary>
-        /// Returns a instance of a sender given the type of the request.
-        /// </summary>
-        /// <typeparam name="TSend">Type of request object</typeparam>
-        /// <returns>Sender that is able to handler the type of the request object</returns>
-        public ISender ResolveSender<TSend>()
-        {
-            return sender;
+            // Routes all requests to a single sender
+            Route<object>(sender);
         }
     }
 }

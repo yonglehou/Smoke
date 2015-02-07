@@ -54,7 +54,7 @@ namespace Smoke
 
 
         /// <summary>
-        /// Starts a synchronus call to run the server with the specified CancellationToken to exit the loop
+        /// Runs the server with the specified CancellationToken to exit the loop
         /// </summary>
         public void Run(CancellationToken cancellationToken)
         {
@@ -66,6 +66,19 @@ namespace Smoke
                 Thread.Yield();
             }
             while (!cancellationToken.IsCancellationRequested);
+        }
+
+
+        /// <summary>
+        /// Starts the server running in a new background task
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task Start(CancellationToken cancellationToken)
+        {
+            Task serverTask = new Task(() => Run(cancellationToken), TaskCreationOptions.LongRunning);
+            serverTask.Start();
+            return serverTask;
         }
 
 

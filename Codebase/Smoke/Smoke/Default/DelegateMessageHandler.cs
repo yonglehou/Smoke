@@ -7,23 +7,34 @@ using System.Threading.Tasks;
 namespace Smoke.Default
 {
     /// <summary>
-    /// Delegate that defines a function for handling a request
+    /// Delegate that defines a function for handling a request message
     /// </summary>
     /// <param name="message">Incoming request message</param>
     /// <param name="messageFactory">Factory for extracting the request object and wrapping the reply object</param>
     /// <returns>Outgoing response message</returns>
-    public delegate Message RequestHandlerDelegate(Message message, IMessageFactory messageFactory);
+    internal delegate Message MessageHandlerDelegate(Message message, IMessageFactory messageFactory);
 
 
     /// <summary>
-    /// MessageHandlerDelegates are 
+    /// Delegate that defines a function for handling a request
+    /// </summary>
+    /// <typeparam name="TRequest">Type of request object or object graph root</typeparam>
+    /// <typeparam name="TResponse">Type of response object or object graph root</typeparam>
+    /// <param name="request">Request object</param>
+    /// <returns>Response object</returns>
+    public delegate TResponse RequestHandlerDelegate<TRequest, TResponse>(TRequest request);
+
+
+
+    /// <summary>
+    /// MessageHandlerDelegates implements IMessageHandler and exposes methods to registering handlers for incoming requests
     /// </summary>
     public class DelegateMessageHandler : IMessageHandler
     {
         /// <summary>
         /// Stores a readonly reference to a Dictionary of Types and RequestHandlerDelegates
         /// </summary>
-        private readonly IDictionary<Type, RequestHandlerDelegate> requestHandlers = new Dictionary<Type, RequestHandlerDelegate>();
+        private readonly IDictionary<Type, MessageHandlerDelegate> requestHandlers = new Dictionary<Type, MessageHandlerDelegate>();
 
 
         /// <summary>
@@ -63,6 +74,25 @@ namespace Smoke.Default
                 return messageFactory.CreateResponse<TResponse>(response);
             });
 
+            return this;
+        }
+
+
+        /// <summary>
+        /// Registers a RequestHandlerDelegate as handler for the specified request type
+        /// </summary>
+        /// <typeparam name="TRequest">Type of request object or object graph root</typeparam>
+        /// <typeparam name="TResponse">Type of response object or object graph root</typeparam>
+        /// <param name="handler">Request handler delegate</param>
+        /// <returns>Caller instance of MessageHandler for fluently construction</returns>
+        public DelegateMessageHandler Register<TRequest, TResponse>(RequestHandlerDelegate<TRequest, TResponse> handler)
+        {
+            requestHandlers.Add(typeof(TRequest), (requestMessage, messageFactory) =>
+            {
+                var request = messageFactory.ExtractRequest(requestMessage);
+                var response = handler((TRequest)request);
+                return messageFactory.CreateResponse<TResponse>(response);
+            });
             return this;
         }
     }

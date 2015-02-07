@@ -13,8 +13,16 @@ namespace Smoke
     public interface IServer
     {
         /// <summary>
-        /// Starts a synchronus call to run the server with the specified CancellationToken to exit the loop
+        /// Runs the server with the specified CancellationToken to exit the loop
         /// </summary>
         void Run(CancellationToken cancellationToken);
+
+
+        /// <summary>
+        /// Starts the server running in a new background task
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task Start(CancellationToken cancellationToken);
     }
 }
