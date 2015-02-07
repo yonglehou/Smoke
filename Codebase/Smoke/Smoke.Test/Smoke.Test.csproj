@@ -56,8 +56,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Defaults\DelegateMessageHandlerTest.cs" />
+    <Compile Include="Defaults\MessageFactoryTest.cs" />
     <Compile Include="Serializers\BinarySerializerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerTest.cs" />
+    <Compile Include="TestExtensions\AssertException.cs" />
+    <Compile Include="ClientTest.cs" />
+    <Compile Include="DataMessageTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

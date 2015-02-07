@@ -37,7 +37,7 @@ namespace Smoke.NetMQ
 
             ResponseSocket socket = context.CreateResponseSocket();
             socket.Bind(address);
-            this.receiver = new NetMQReceiver(socket, new BinarySerializer(new BinaryFormatter()));
+            this.receiver = new NetMQReceiver(socket, new BinarySerializer());
         }
 
 

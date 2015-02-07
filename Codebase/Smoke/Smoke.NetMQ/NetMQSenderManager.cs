@@ -37,7 +37,7 @@ namespace Smoke.NetMQ
             RequestSocket socket = context.CreateRequestSocket();
             socket.Connect(address);
 
-            sender = new NetMQSender(socket, new BinarySerializer(new BinaryFormatter()));
+            sender = new NetMQSender(socket, new BinarySerializer());
         }
 
 

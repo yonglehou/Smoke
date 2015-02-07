@@ -15,7 +15,7 @@ namespace Smoke.Test.Serializers
         {
             // Setup
             var random = new Random();
-            var binarySerializer = new BinarySerializer(new BinaryFormatter());
+            var binarySerializer = new BinarySerializer();
 
 
             for (int i = 0; i < 10; i++)
@@ -33,7 +33,7 @@ namespace Smoke.Test.Serializers
         {
             // Setup
             var random = new Random();
-            var binarySerializer = new BinarySerializer(new BinaryFormatter());
+            var binarySerializer = new BinarySerializer();
 
 
             for (int i = 0; i < 10; i++)
@@ -51,7 +51,7 @@ namespace Smoke.Test.Serializers
         {
             // Setup
             var random = new Random();
-            var binarySerializer = new BinarySerializer(new BinaryFormatter());
+            var binarySerializer = new BinarySerializer();
 
             for (int i = 0; i < 10; i++)
             {
@@ -72,14 +72,13 @@ namespace Smoke.Test.Serializers
         public void SerializeDictionary()
         {
             // Setup
-            var random = new Random();
-            var binarySerializer = new BinarySerializer(new BinaryFormatter());
+            var binarySerializer = new BinarySerializer();
 
             for (int i = 0; i < 10; i++)
             {
                 var list = new Dictionary<int, Guid>();
                 for (int j = 0; j < i; j++)
-                    list.Add(random.Next(-100, 100), Guid.NewGuid());
+                    list.Add(j, Guid.NewGuid());
 
                 byte[] data = binarySerializer.Serialize<Dictionary<int, Guid>>(list);
                 Dictionary<int, Guid> result = binarySerializer.Deserialize<Dictionary<int, Guid>>(data);
@@ -101,7 +100,7 @@ namespace Smoke.Test.Serializers
         {
             // Setup
             var random = new Random();
-            var binarySerializer = new BinarySerializer(new BinaryFormatter());
+            var binarySerializer = new BinarySerializer();
 
             TestContainer container = new TestContainer();
             for (int i = 0; i < 10; i++)

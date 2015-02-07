@@ -32,6 +32,8 @@ namespace Smoke.Sandbox
                     response = client.Send<int, RandomNumberRequest>(new RandomNumberRequest() { Min = 10, Max = 100 });
                     Console.WriteLine(response);
                 }
+
+                cancellationTokenSource.Cancel();
             }
         }
     }

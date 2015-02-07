@@ -13,12 +13,6 @@ namespace Smoke.Default
     public class MessageFactory : IMessageFactory
     {
         /// <summary>
-        /// Stores a reference to the ExtractData method
-        /// </summary>
-        private MethodInfo extractDataMethod = typeof(MessageFactory).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).First(m => m.Name == "ExtractData");
-
-
-        /// <summary>
         /// Wraps the specified request object or object graph in a Smoke protocol Message
         /// </summary>
         /// <typeparam name="TRequest">Type of request object or object graph root</typeparam>
@@ -26,6 +20,8 @@ namespace Smoke.Default
         /// <returns>Smoke protocol Message wrapping the response object or object graph</returns>
         public Message CreateRequest<TRequest>(TRequest request)
         {
+            if (typeof(Message).IsAssignableFrom(request.GetType()))
+                return request as Message;
             return new DataMessage<TRequest>(request);
         }
 
@@ -37,19 +33,7 @@ namespace Smoke.Default
         /// <returns>Object encapsulating a server request</returns>
         public object ExtractRequest(Message requestMessage)
         {
-            Type requestMessageType = requestMessage.GetType();
-
-            // If the message typoe if a DataMessage this constructs a typesafe message call to extract the wrapped object
-            // from the message.
-            // Could change this to make a dictionary of calls so that the construction of the call only happens once. Would need
-            // to run some perfomance tests to see which is fastest
-            if (requestMessageType.IsGenericType && requestMessageType.GetGenericTypeDefinition() == typeof(DataMessage<>))
-            {
-                MethodInfo extractMethod = extractDataMethod.MakeGenericMethod(requestMessageType.GenericTypeArguments[0]);
-                return extractMethod.Invoke(this, new object[] { requestMessage });
-            }
-            else
-                throw new InvalidOperationException("Unable to extract request from message");
+            return requestMessage.MessageObject;
         }
 
 
@@ -61,6 +45,8 @@ namespace Smoke.Default
         /// <returns>Smoke protocol Message wrapping the response object or object graph</returns>
         public Message CreateResponse<TResponse>(TResponse response)
         {
+            if (typeof(Message).IsAssignableFrom(response.GetType()))
+                return response as Message;
             return new DataMessage<TResponse>(response);
         }
         
@@ -73,22 +59,12 @@ namespace Smoke.Default
         /// <returns>Response object</returns>
         public TResponse ExtractResponse<TResponse>(Message responseMessage)
         {
-            if (responseMessage is DataMessage<TResponse>)
+            if (responseMessage.GetType() == typeof(TResponse))
+                return (TResponse)(object)responseMessage;
+            else if (responseMessage is DataMessage<TResponse>)
                 return (responseMessage as DataMessage<TResponse>).Data;
             else
-                throw new InvalidOperationException("Unable to extract response from message");
-        }
-
-
-        /// <summary>
-        /// Extracts a request object from the specified DataMessage. Method is called using reflection for runtime type safey
-        /// </summary>
-        /// <typeparam name="T">Variable type of contained object or object graph root</typeparam>
-        /// <param name="requestMessage">Smoke protocol Message wrapping the request object or object graph root</param>
-        /// <returns>Data object</returns>
-        private object ExtractData<T>(DataMessage<T> requestMessage)
-        {
-            return requestMessage.Data;
+                throw new InvalidCastException("Unable to extract response from message");
         }
     }
 }

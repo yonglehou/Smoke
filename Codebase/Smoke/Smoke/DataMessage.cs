@@ -67,9 +67,9 @@ namespace Smoke
 
 
         /// <summary>
-        /// Gets the object wrapped by the message should it exist, and null if else
+        /// Gets the object wrapped by the message should it exist, and the message itself if not
         /// </summary>
-        public override object DomainObject
+        public override object MessageObject
         { get { return Data; } }
     }
 }

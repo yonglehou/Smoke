@@ -23,13 +23,9 @@ namespace Smoke.Serializers
         /// <summary>
         /// Constructs a BinarySerializer with the specified IFormatter
         /// </summary>
-        /// <param name="binaryFormatter"></param>
-        public BinarySerializer(BinaryFormatter binaryFormatter)
+        public BinarySerializer()
         {
-            if (binaryFormatter == null)
-                throw new ArgumentNullException("BinaryFormatter");
-
-            this.binaryFormatter = binaryFormatter;
+            this.binaryFormatter = new BinaryFormatter();
         }
 
 

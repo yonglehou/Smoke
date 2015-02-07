@@ -58,16 +58,14 @@ namespace Smoke
         /// </summary>
         public void Run(CancellationToken cancellationToken)
         {
-            while (true)
+            do
             {
                 var task = receiverManager.Receive();
                 Reply(task.Request, task.ResponseAction);
 
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
                 Thread.Yield();
             }
+            while (!cancellationToken.IsCancellationRequested);
         }
 
 
