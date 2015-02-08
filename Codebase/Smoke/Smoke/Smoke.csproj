@@ -40,6 +40,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Default\SenderManager.cs" />
+    <Compile Include="Routing\ISenderCondition.cs" />
+    <Compile Include="Routing\ISenderResolver.cs" />
+    <Compile Include="Routing\ISenderSelectorBackup.cs" />
+    <Compile Include="Routing\ISenderSelectorCondition.cs" />
+    <Compile Include="Routing\ISenderSelectorWhen.cs" />
+    <Compile Include="Routing\SenderConditionAlways.cs" />
+    <Compile Include="Routing\SenderConditionBackup.cs" />
+    <Compile Include="Routing\SenderConditionElse.cs" />
+    <Compile Include="Routing\SenderConditionWhen.cs" />
+    <Compile Include="Routing\SenderSelector.cs" />
     <Compile Include="Serializers\BinarySerializer.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="DataMessage.cs" />

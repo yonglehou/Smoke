@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Smoke.Routing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,46 +15,106 @@ namespace Smoke.Default
         /// <summary>
         /// Stores a readonly reference to a dictionary that matches request types to a sender
         /// </summary>
-        private readonly Dictionary<Type, ISender> routingTable = new Dictionary<Type, ISender>();
+        private readonly Dictionary<Type, ISenderResolver> routingTable = new Dictionary<Type, ISenderResolver>();
 
 
         /// <summary>
         /// Returns a instance of a sender given the type of the request. Types are matched against internal routing
         /// dictionary, will match a derrived type to a registered base type
         /// </summary>
-        /// <typeparam name="TSend">Type of request object</typeparam>
+        /// <typeparam name="TSend">Type of request object to resolve sender for</typeparam>
         /// <returns>Sender that is able to handler the type of the request object</returns>
         public ISender ResolveSender<TSend>()
         {
             foreach (var kv in routingTable)
                 if (kv.Key.IsAssignableFrom(typeof(TSend)))
-                    return kv.Value;
+                    return kv.Value.ResolveSender();
 
             throw new InvalidOperationException("Unable to find a destination for message");
         }
 
 
         /// <summary>
-        /// Registers the specified type to the sender. First registered type wins should a type have several
-        /// derrived base classes registered
+        /// Returns a instance of a sender given the type of the request. Types are matched against internal routing
+        /// dictionary, will match a derrived type to a registered base type
         /// </summary>
-        /// <typeparam name="T">Type to route</typeparam>
-        /// <param name="sender">Sender to route to</param>
-        /// <returns>SenderManager for fluency</returns>
-        public SenderManager Route<T>(ISender sender)
+        /// <typeparam name="TSend">Type of request object to resolve sender for</typeparam>
+        /// <param name="obj">Insance of request object to test routing conditions on</param>
+        /// <returns>Sender that is able to handler the type of the request object</returns>
+        public ISender ResolveSender<TSend>(TSend obj)
         {
-            routingTable.Add(typeof(T), sender);
-            return this;
+            foreach (var kv in routingTable)
+                if (kv.Key.IsAssignableFrom(typeof(TSend)))
+                    return kv.Value.ResolveSender<TSend>(obj);
+
+            throw new InvalidOperationException("Unable to find a destination for message");
         }
+
+
+        #region Fluent Construction
 
 
         /// <summary>
         /// Creates a new SenderManager
         /// </summary>
-        /// <returns></returns>
+        /// <returns>SenderManager for fluency</returns>
         public static SenderManager Create()
         {
             return new SenderManager();
         }
+
+
+        /// <summary>
+        /// Registers the specified type with the specified sender. Subtypes are caught unless there is an
+        /// alternative routing specified before this function call in the routing setup
+        /// </summary>
+        /// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
+        /// <param name="sender">Sender to route requests to by default</param>
+        /// <returns>SenderManager for fluency</returns>
+        public SenderManager Route<T>(ISender sender)
+        {
+            var senderSelector = new SenderSelector<T>();
+            senderSelector.AddAlways(sender);
+            routingTable.Add(typeof(T), senderSelector);
+            return this;
+        }
+
+
+        /// <summary>
+        /// Registers the specified type with a default sender, and then backups in order. Subtypes are caught
+        /// unless there is an alternative routing specified before this function call in the routing setup
+        /// </summary>
+        /// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
+        /// <param name="sender">Sender to route request to by default</param>
+        /// <param name="backups">Senders to route request to in order if the previous or default is unavailable</param>
+        /// <returns>SenderManager for fluency</returns>
+        public SenderManager Route<T>(ISender sender, params ISender[] backups)
+        {
+            var senderSelector = new SenderSelector<T>();
+            senderSelector.AddAlways(sender);
+
+            foreach (var backup in backups)
+                senderSelector.AddBackup(backup);
+
+            routingTable.Add(typeof(T), senderSelector);
+            return this;
+        }
+
+
+        /// <summary>
+        /// Registers the specified type with the proceeding conditions. Subtypes are caught unless there
+        /// is an alternative routing specified before this function call in the routing setup
+        /// </summary>
+        /// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
+        /// <returns>ISenderSelectorCondition for fluent specification of routing coditions</returns>
+        public ISenderSelectorCondition<T> Route<T>()
+        {
+            var senderSelector = new SenderSelector<T>();
+            routingTable.Add(typeof(T), senderSelector);
+            return senderSelector;
+        }
+
+
+        #endregion
     }
 }

@@ -10,20 +10,23 @@ namespace Smoke.Test.Defaults
     [TestClass]
     public class SenderManagerTest
     {
+        /// <summary>
+        /// Tests the basic resolution of senders based on the type of request supplied
+        /// </summary>
         [TestMethod]
-        public void SenderManager_TestRouting()
+        public void SenderManager_TestBasicRouting()
         {
             // Setup
-            var senderManager = new SenderManager();
             var sender1 = (new Mock<ISender>()).Object;
             var sender2 = (new Mock<ISender>()).Object;
 
-            senderManager.Route<int>(sender1)
-                         .Route<DateTime>(sender2)
-                         .Route<App1>(sender1)
-                         .Route<App2>(sender2);
+            var senderManager = SenderManager.Create()
+                                             .Route<int>(sender1)
+                                             .Route<DateTime>(sender2)
+                                             .Route<App1>(sender1)
+                                             .Route<App2>(sender2);
 
-
+            // Test
             Assert.AreEqual(sender1, senderManager.ResolveSender<int>());
             Assert.AreEqual(sender2, senderManager.ResolveSender<DateTime>());
             Assert.AreEqual(sender1, senderManager.ResolveSender<App1Request1>());
@@ -32,6 +35,54 @@ namespace Smoke.Test.Defaults
             Assert.AreEqual(sender2, senderManager.ResolveSender<App2Request2>());
 
             AssertException.Throws<InvalidOperationException>(() => senderManager.ResolveSender<Guid>());
+            AssertException.Throws<InvalidOperationException>(() => senderManager.ResolveSender<Guid>(Guid.NewGuid()));
+        }
+
+
+        /// <summary>
+        /// Tests the conditional routing of request objects to different senders using the Where/Else pattern
+        /// </summary>
+        [TestMethod]
+        public void SenderManager_TestConditionalRouting()
+        {
+            // Setup
+            var senderManager = new SenderManager();
+            var sender1 = (new Mock<ISender>()).Object;
+            var sender2 = (new Mock<ISender>()).Object;
+            var sender3 = (new Mock<ISender>()).Object;
+            var sender4 = (new Mock<ISender>()).Object;
+
+            senderManager.Route<DateTime>().When(dt => dt.Year == 2015, sender1)
+                                           .When(dt => dt.Year == 2016, sender2)
+                                           .When(dt => dt.Year == 2017, sender3)
+                                           .Else(sender4);
+
+            // Test
+            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>(new DateTime(2015, 02, 02)));
+            Assert.AreEqual(sender2, senderManager.ResolveSender<DateTime>(new DateTime(2016, 03, 03)));
+            Assert.AreEqual(sender3, senderManager.ResolveSender<DateTime>(new DateTime(2017, 04, 04)));
+            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>(new DateTime(2014, 01, 01)));
+            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>(new DateTime(2018, 01, 01)));
+            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>());
+        }
+
+
+        /// <summary>
+        /// Tests setting a default routing in the fluent specification
+        /// </summary>
+        [TestMethod]
+        public void SenderManager_AlwaysRouting()
+        {
+            // Setup
+            var senderManager = new SenderManager();
+            var sender1 = (new Mock<ISender>()).Object;
+            var sender2 = (new Mock<ISender>()).Object;
+
+            senderManager.Route<DateTime>().Always(sender1).Backup(sender2);
+
+            // Test
+            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>());
+            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>(DateTime.Now));
         }
     }
 }
