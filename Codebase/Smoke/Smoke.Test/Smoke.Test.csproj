@@ -59,6 +59,8 @@
     <Compile Include="Default\DelegateMessageHandlerTest.cs" />
     <Compile Include="Default\MessageFactoryTest.cs" />
     <Compile Include="Default\SenderManagerTest.cs" />
+    <Compile Include="Mocks\MockMessageHandler.cs" />
+    <Compile Include="Mocks\MockSender.cs" />
     <Compile Include="Routing\SenderConditionAlwaysTest.cs" />
     <Compile Include="Routing\SenderConditionBackupTest.cs" />
     <Compile Include="Routing\SenderConditionElseTest.cs" />

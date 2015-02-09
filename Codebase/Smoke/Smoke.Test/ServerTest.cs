@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Smoke.Test.Mocks;
 using Smoke.Test.TestExtensions;
 using System;
 using System.Collections.Generic;
@@ -95,15 +96,6 @@ namespace Smoke.Test
             // Assert
             Assert.IsTrue(task.IsCompleted);
             receiverManagerMock.Verify(m => m.Receive(), Times.AtLeastOnce());
-        }
-
-
-        private class MockMessageHandler : IMessageHandler
-        {
-            public Message Handle(Message request, IMessageFactory messageFactory)
-            {
-                return request;
-            }
         }
     }
 }

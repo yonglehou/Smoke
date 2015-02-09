@@ -37,7 +37,7 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition()
         {
-            return true;
+            return sender.Available;
         }
 
 
@@ -48,7 +48,7 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition(T obj)
         {
-            return true;
+            return sender.Available;
         }
 
 

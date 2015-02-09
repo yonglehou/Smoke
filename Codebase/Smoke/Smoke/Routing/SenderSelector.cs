@@ -99,9 +99,19 @@ namespace Smoke.Routing
         /// <returns>ISender to dispatch the request to</returns>
         public ISender ResolveSender(object obj)
         {
+            bool testResult, conditionUnavailable = false;
+
             foreach (var condition in conditionList)
-                if (condition.TestCondition((T)obj))
+            {
+                testResult = condition.TestCondition((T)obj);
+
+                if (testResult && (!conditionUnavailable || condition is SenderConditionBackup<T>))
+                    // While there hasn't been a conditional unavailable, check only on the rest result, otherwise only look at backups
                     return condition.RoutedSender;
+                else if (condition is SenderConditionWhen<T> && !condition.RoutedSender.Available)
+                    // When there is a conditional unavailable, switch to checking only backups
+                    conditionUnavailable = true;
+            }
 
             throw new ApplicationException("Unable to resolve a sender");
         }
@@ -121,9 +131,19 @@ namespace Smoke.Routing
 
             T request = (T)(object)obj;         // This is why I should restrict send types to objects
 
+            bool testResult, conditionUnavailable = false;
+
             foreach (var condition in conditionList)
-                if (condition.TestCondition(request))
+            {
+                testResult = condition.TestCondition(request);
+
+                if (testResult && (!conditionUnavailable || condition is SenderConditionBackup<T>))
+                    // While there hasn't been a conditional unavailable, check only on the rest result, otherwise only look at backups
                     return condition.RoutedSender;
+                else if (condition is SenderConditionWhen<T> && !condition.RoutedSender.Available)
+                    // When there is a conditional unavailable, switch to checking only backups
+                    conditionUnavailable = true;
+            }
 
             throw new ApplicationException("Unable to resolve a sender");
         }

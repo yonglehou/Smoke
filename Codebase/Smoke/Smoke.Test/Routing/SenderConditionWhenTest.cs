@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Smoke.Routing;
 using Smoke.Test.TestExtensions;
+using Smoke.Test.Mocks;
 
 namespace Smoke.Test.Routing
 {
@@ -12,13 +13,13 @@ namespace Smoke.Test.Routing
         [TestMethod]
         public void SenderConditionWhen_Construction()
         {
-            var senderMock = new Mock<ISender>();
-            var senderConditionWhen = new SenderConditionWhen<DateTime>(dt => true, senderMock.Object);
+            var senderMock = new MockSender();
+            var senderConditionWhen = new SenderConditionWhen<DateTime>(dt => true, senderMock);
 
             // Run & Assert
             AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(d => true, null));
-            AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(null, senderMock.Object));
-            Assert.AreEqual(senderMock.Object, senderConditionWhen.RoutedSender);
+            AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(null, senderMock));
+            Assert.AreEqual(senderMock, senderConditionWhen.RoutedSender);
         }
 
 
@@ -26,10 +27,8 @@ namespace Smoke.Test.Routing
         public void SenderConditionWhen_Condition()
         {
             // Setup
-            var sender1Mock = new Mock<ISender>();
-            var sender2Mock = new Mock<ISender>();
-            var sender3Mock = new Mock<ISender>();
-            var senderConditionWhen = new SenderConditionWhen<DateTime>(d => d.Year % 3 == 0, sender1Mock.Object);
+            var sender1Mock = new MockSender();
+            var senderConditionWhen = new SenderConditionWhen<DateTime>(d => d.Year % 3 == 0, sender1Mock);
 
             // Run & Assert
             Assert.IsFalse(senderConditionWhen.TestCondition());
@@ -42,6 +41,11 @@ namespace Smoke.Test.Routing
                 Assert.IsFalse(senderConditionWhen.TestCondition(dt.AddYears(++i)));
                 Assert.IsFalse(senderConditionWhen.TestCondition(dt.AddYears(++i)));
             }
+
+            sender1Mock.Available = false;
+
+            for (int i = 0; i < 20; i++)
+                Assert.IsFalse(senderConditionWhen.TestCondition(dt.AddYears(i)));
         }
     }
 }

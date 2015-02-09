@@ -4,6 +4,7 @@ using MagicMoq;
 using Moq;
 using Smoke.Test.TestExtensions;
 using System.Collections.Generic;
+using Smoke.Test.Mocks;
 
 namespace Smoke.Test
 {
@@ -37,11 +38,11 @@ namespace Smoke.Test
         public void GenericSendMethod<T>(T sendObject)
         {
             // Setup
-            var sender = new Mock<ISender>();
-            sender.Setup(m => m.Send(It.IsAny<Message>())).Returns<Message>(m => m);
+            var senderMock = new Mock<ISender>();
+            senderMock.Setup(m => m.Send(It.IsAny<Message>())).Returns<Message>(m => m);
 
             var senderManager = new Mock<ISenderManager>();
-            senderManager.Setup(m => m.ResolveSender<T>()).Returns(sender.Object);
+            senderManager.Setup(m => m.ResolveSender<T>()).Returns(senderMock.Object);
 
             var messageFactory = new Mock<IMessageFactory>();
             messageFactory.Setup(m => m.CreateRequest<T>(It.IsAny<T>())).Returns<T>(t => new DataMessage<T>(t));
@@ -54,7 +55,7 @@ namespace Smoke.Test
 
             // Assert
             senderManager.Verify(m => m.ResolveSender<T>(), Times.Once);
-            sender.Verify(m => m.Send(It.IsAny<Message>()), Times.Once);
+            senderMock.Verify(m => m.Send(It.IsAny<Message>()), Times.Once);
             messageFactory.Verify(m => m.ExtractResponse<T>(It.IsAny<Message>()), Times.Once);
 
             Assert.AreEqual(sendObject, response);

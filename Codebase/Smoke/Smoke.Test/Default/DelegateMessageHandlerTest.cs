@@ -40,6 +40,7 @@ namespace Smoke.Test.Defaults
             idHandler.Verify(h => h.Handle(idMessage.Data), Times.Once);
         }
 
+
         [TestMethod]
         public void DelegateMessageHandler_DelegateHandler()
         {

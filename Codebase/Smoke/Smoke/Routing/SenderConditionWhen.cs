@@ -60,7 +60,7 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition(T obj)
         {
-            return predicate(obj);
+            return predicate(obj) && sender.Available;
         }
 
 

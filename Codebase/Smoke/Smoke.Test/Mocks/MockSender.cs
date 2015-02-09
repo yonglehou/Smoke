@@ -1,0 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Smoke.Test.Mocks
+{
+    //ncrunch: no coverage start
+
+    /// <summary>
+    /// MockSender to control availability
+    /// </summary>
+    public class MockSender : ISender
+    {
+        private bool available = true;
+
+        public bool Available
+        {
+            get { return available; }
+            set { available = value; }
+        }
+
+        public Message Send(Message message)
+        {
+            return message;
+        }
+    }
+
+    //ncrunch: no coverage end
+}

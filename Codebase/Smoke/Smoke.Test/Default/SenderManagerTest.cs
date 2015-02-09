@@ -4,6 +4,7 @@ using Smoke.Default;
 using Moq;
 using Smoke.Test.TestRequests;
 using Smoke.Test.TestExtensions;
+using Smoke.Test.Mocks;
 
 namespace Smoke.Test.Defaults
 {
@@ -17,8 +18,8 @@ namespace Smoke.Test.Defaults
         public void SenderManager_BasicRouting()
         {
             // Setup
-            var sender1 = (new Mock<ISender>()).Object;
-            var sender2 = (new Mock<ISender>()).Object;
+            var sender1 = new MockSender();
+            var sender2 = new MockSender();
 
             var senderManager = SenderManager.Create()
                                              .Route<int>(sender1)
@@ -44,10 +45,10 @@ namespace Smoke.Test.Defaults
         {
             // Setup
             var senderManager = new SenderManager();
-            var sender1 = (new Mock<ISender>()).Object;
-            var sender2 = (new Mock<ISender>()).Object;
-            var sender3 = (new Mock<ISender>()).Object;
-            var sender4 = (new Mock<ISender>()).Object;
+            var sender1 = new MockSender();
+            var sender2 = new MockSender();
+            var sender3 = new MockSender();
+            var sender4 = new MockSender();
 
             senderManager.Route<DateTime>(sender1, sender2, sender3, sender4);
 
@@ -66,10 +67,10 @@ namespace Smoke.Test.Defaults
         {
             // Setup
             var senderManager = new SenderManager();
-            var sender1 = (new Mock<ISender>()).Object;
-            var sender2 = (new Mock<ISender>()).Object;
-            var sender3 = (new Mock<ISender>()).Object;
-            var sender4 = (new Mock<ISender>()).Object;
+            var sender1 = new MockSender();
+            var sender2 = new MockSender();
+            var sender3 = new MockSender();
+            var sender4 = new MockSender();
 
             senderManager.Route<DateTime>().When(dt => dt.Year == 2015, sender1)
                                            .When(dt => dt.Year == 2016, sender2)
@@ -94,8 +95,8 @@ namespace Smoke.Test.Defaults
         {
             // Setup
             var senderManager = new SenderManager();
-            var sender1 = (new Mock<ISender>()).Object;
-            var sender2 = (new Mock<ISender>()).Object;
+            var sender1 = new MockSender();
+            var sender2 = new MockSender();
 
             senderManager.Route<DateTime>().Always(sender1).Backup(sender2);
 
