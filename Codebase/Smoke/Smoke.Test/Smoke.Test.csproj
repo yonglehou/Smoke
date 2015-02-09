@@ -59,6 +59,11 @@
     <Compile Include="Default\DelegateMessageHandlerTest.cs" />
     <Compile Include="Default\MessageFactoryTest.cs" />
     <Compile Include="Default\SenderManagerTest.cs" />
+    <Compile Include="Routing\SenderConditionAlwaysTest.cs" />
+    <Compile Include="Routing\SenderConditionBackupTest.cs" />
+    <Compile Include="Routing\SenderConditionElseTest.cs" />
+    <Compile Include="Routing\SenderConditionWhenTest.cs" />
+    <Compile Include="Routing\SenderSelectorTest.cs" />
     <Compile Include="Serializers\BinarySerializerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerTest.cs" />

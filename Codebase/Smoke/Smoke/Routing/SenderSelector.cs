@@ -17,11 +17,18 @@ namespace Smoke.Routing
         ISenderSelectorBackup<T>,
         ISenderSelectorWhen<T>
     {
+        #region Members
+
+
         /// <summary>
         /// Stores a readonly reference to a list of conditions that the sender selector will iterate through
         /// to resolve a sender
         /// </summary>
         private readonly List<ISenderCondition<T>> conditionList = new List<ISenderCondition<T>>();
+
+
+        #endregion
+        #region Methods
 
 
         /// <summary>
@@ -65,6 +72,7 @@ namespace Smoke.Routing
         }
 
 
+        #endregion
         #region ISenderResolver
 
 
@@ -111,7 +119,7 @@ namespace Smoke.Routing
             if (!typeof(T).IsAssignableFrom(typeof(TSend)))
                 throw new InvalidCastException("Types don't match");
 
-            T request = (T)(object)obj;
+            T request = (T)(object)obj;         // This is why I should restrict send types to objects
 
             foreach (var condition in conditionList)
                 if (condition.TestCondition(request))

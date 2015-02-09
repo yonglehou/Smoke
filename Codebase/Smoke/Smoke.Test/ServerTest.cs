@@ -14,13 +14,15 @@ namespace Smoke.Test
     public class ServerTest
     {
         [TestMethod]
-        public void Server_ConstructorTest()
+        public void Server_Constructor()
         {
+            // Setup
             var messageHandler = new Mock<IMessageHandler>();
             var messageFactory = new Mock<IMessageFactory>();
             var receiverManager = new Mock<IReceiverManager>();
 
             var server = new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object);
+
 
             AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactory.Object, messageHandler.Object));
             AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, null, messageHandler.Object));
@@ -29,41 +31,70 @@ namespace Smoke.Test
 
 
         [TestMethod]
-        public void Server_GeneralRunTest()
+        public void Server_Run()
         {
-            GenericRunTest<DateTime>(DateTime.Now);
-            GenericRunTest<Guid>(Guid.NewGuid());
+            GenericSyncRunTest<DateTime>(DateTime.Now);
+            GenericSyncRunTest<Guid>(Guid.NewGuid());
+            GenericTaskRunTest<DateTime>(DateTime.Now);
+            GenericTaskRunTest<Guid>(Guid.NewGuid());
         }
 
 
-        public void GenericRunTest<T>(T receiveObject)
+        public void GenericSyncRunTest<T>(T receiveObject)
         {
             // Setup
-            var messageHandler = new MockMessageHandler();
-            var messageFactory = new Mock<IMessageFactory>();
-            var receiverManager = new Mock<IReceiverManager>();
-            var receiver = new Mock<IReceiver>();
+            var mockMessageHandler = new MockMessageHandler();
+            var messageFactoryMock = new Mock<IMessageFactory>();
+            var receiverManagerMock = new Mock<IReceiverManager>();
+            var receiverMock = new Mock<IReceiver>();
 
             var message = new DataMessage<T>(receiveObject);
-            var cancellationToken = new CancellationTokenSource();
+            var cancellationTokenSource = new CancellationTokenSource();
             Action<Message> responseAction = m =>
             {
                 Assert.AreEqual(message, m);
-                cancellationToken.Cancel();
+                cancellationTokenSource.Cancel();
             };
             var requestTask = new RequestTask(message, responseAction);
 
-            receiverManager.Setup(m => m.Receive()).Returns(requestTask);
+            receiverManagerMock.Setup(m => m.Receive()).Returns(requestTask);
 
 
-            var server = new Server(receiverManager.Object, messageFactory.Object, messageHandler);
+            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, mockMessageHandler);
 
             // Run
-            server.Run(cancellationToken.Token);
-
+            server.Run(cancellationTokenSource.Token);
 
             // Assert
-            receiverManager.Verify(m => m.Receive(), Times.AtLeastOnce());
+            receiverManagerMock.Verify(m => m.Receive(), Times.AtLeastOnce());
+        }
+
+
+        public void GenericTaskRunTest<T>(T receiveObject)
+        {
+            // Setup
+            var mockMessageHandler = new MockMessageHandler();
+            var messageFactoryMock = new Mock<IMessageFactory>();
+            var receiverManagerMock = new Mock<IReceiverManager>();
+            var receiverMock = new Mock<IReceiver>();
+            var message = new DataMessage<T>(receiveObject);
+            Action<Message> responseAction = m => { Assert.AreEqual(message, m); };
+            var requestTask = new RequestTask(message, responseAction);
+            receiverManagerMock.Setup(m => m.Receive()).Returns(requestTask);
+            var cancellationTokenSource = new CancellationTokenSource();
+
+
+            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, mockMessageHandler);
+
+            // Run
+            var task = server.Start(cancellationTokenSource.Token);
+            Thread.Sleep(1);
+            cancellationTokenSource.Cancel();
+            Thread.Sleep(1);
+
+            // Assert
+            Assert.IsTrue(task.IsCompleted);
+            receiverManagerMock.Verify(m => m.Receive(), Times.AtLeastOnce());
         }
 
 
