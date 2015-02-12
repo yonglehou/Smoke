@@ -27,7 +27,7 @@ namespace _1_2_MultipleHandlers
                         .Register<QuadraticRequest, QuadraticResponse>(new QuadraticRequestHandler());
 
                 // Create the server and client
-                Server server = new Server(new NetMQReceiverManager(context, "tcp://127.0.0.1:5556"), messageFactory, messageHandler);
+                Server server = new Server(new NetMQReceiverManager(context, "tcp://127.0.0.1:5556"), messageFactory, messageHandler, "ExampleServer");
                 Client client = new Client(new NetMQSenderManager(context, "tcp://127.0.0.1:5556"), messageFactory);
 
                 // Run the server in a task with a cancellation token to cancel the task later

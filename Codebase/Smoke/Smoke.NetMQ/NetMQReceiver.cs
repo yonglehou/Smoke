@@ -50,11 +50,18 @@ namespace Smoke.NetMQ
         /// <returns></returns>
         public RequestTask Receive()
         {
-            byte[] data = responseSocket.Receive();
-            var message = binarySerializer.Deserialize<Message>(data);
-            Action<Message> reply = m => responseSocket.Send(binarySerializer.Serialize<Message>(m));
+            try
+            {
+                byte[] data = responseSocket.Receive();
+                var message = binarySerializer.Deserialize<Message>(data);
+                Action<Message> reply = m => responseSocket.Send(binarySerializer.Serialize<Message>(m));
 
-            return new RequestTask(message, reply);
+                return new RequestTask(message, reply);
+            }
+            catch (TerminatingException)
+            {
+                return default(RequestTask);
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace _2_1_Server
                                                                return new App1RandomNumberResponse(random.Next(request.MinBound, request.MaxBound));
                                                            });
 
-                IServer server = new Server(receiverManager, messageFactory, messageHandler);
+                IServer server = new Server(receiverManager, messageFactory, messageHandler, "ExampleServer");
 
                 var cancellationTokenSource = new CancellationTokenSource();
 

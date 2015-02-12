@@ -33,7 +33,7 @@ namespace _2_2_App2Server
                                                                    return new App2ComplementResponse("You are probably a better programmer than me");
                                                            });
 
-                IServer server = new Server(receiverManager, messageFactory, messageHandler);
+                IServer server = new Server(receiverManager, messageFactory, messageHandler, "ExampleServer");
 
                 var cancellationTokenSource = new CancellationTokenSource();
 

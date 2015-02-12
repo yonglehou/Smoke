@@ -11,9 +11,40 @@ namespace Smoke
     public interface ISender
     {
         /// <summary>
-        /// Gets a flag indicating whether the sender is available and able to send messages to the connected server
+        /// Gets a string of the address that the sender connects to
+        /// </summary>
+        String Address { get; }
+
+
+        /// <summary>
+        /// Gets a boolean flag indicating whether the sender is available and able to send messages to the connected server
         /// </summary>
         bool Available { get; }
+
+
+        /// <summary>
+        /// Gets a boolean flag indicating whether the sender is connected
+        /// </summary>
+        bool Connected { get; }
+
+
+        /// <summary>
+        /// Gets a the type of the serializer the sender uses
+        /// </summary>
+        Type SerializerType { get; }
+
+
+        /// <summary>
+        /// Connects the sender to the remote server at the sender's address
+        /// </summary>
+        void Connect();
+
+
+        /// <summary>
+        /// Disconnects the sender from the remote server
+        /// </summary>
+        void Disconnect();
+
 
         /// <summary>
         /// Sends a request message to the connected server and returns the response message, serializing and deserializing the

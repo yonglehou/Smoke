@@ -13,6 +13,24 @@ namespace Smoke
     public interface IServer
     {
         /// <summary>
+        /// Gets a String representing the name of the service instance
+        /// </summary>
+        String Name { get; }
+
+
+        /// <summary>
+        /// Gets a Boolean flag indicating whether the server is running
+        /// </summary>
+        bool Running { get; }
+
+
+        /// <summary>
+        /// Gets a DateTime recording the timestamp at which the server started running
+        /// </summary>
+        DateTime StartTimestamp { get; }
+
+
+        /// <summary>
         /// Runs the server with the specified CancellationToken to exit the loop
         /// </summary>
         void Run(CancellationToken cancellationToken);

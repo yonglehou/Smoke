@@ -26,15 +26,9 @@ namespace Smoke.NetMQ
         /// <param name="context"></param>
         public NetMQSenderManager(NetMQContext context, String address)
         {
-            if (context == null)
-                throw new ArgumentNullException("NetMQContext");
+            var sender = new NetMQSender(context, new BinarySerializer(), address);
+            sender.Connect();
 
-            RequestSocket socket = context.CreateRequestSocket();
-            socket.Connect(address);
-
-            var sender = new NetMQSender(socket, new BinarySerializer());
-
-            // Routes all requests to a single sender
             Route<object>(sender);
         }
     }

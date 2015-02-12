@@ -20,9 +20,7 @@ namespace _2_1_Client
             using (var context = NetMQContext.Create())
             {
                 // Setup
-                var requestSocket = context.CreateRequestSocket();
-                requestSocket.Connect("tcp://127.0.0.1:5556");
-                var sender = new NetMQSender(requestSocket, new BinarySerializer());
+                var sender = new NetMQSender(context, new BinarySerializer(), "tcp://127.0.0.1:5556");
                 var senderManager = SenderManager.Create().Route<object>(sender);
 
                 IClient client = new Client(senderManager, new MessageFactory());

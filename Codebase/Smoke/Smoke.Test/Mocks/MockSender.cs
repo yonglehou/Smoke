@@ -25,6 +25,31 @@ namespace Smoke.Test.Mocks
         {
             return message;
         }
+
+        public string Address
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool Connected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public Type SerializerType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void Connect()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Disconnect()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     //ncrunch: no coverage end

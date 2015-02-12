@@ -14,9 +14,21 @@ namespace Smoke.NetMQ
     public class NetMQSender : ISender
     {
         /// <summary>
+        /// Stores a readonly string representing the address of the remote server the sender connects to
+        /// </summary>
+        private readonly String address;
+
+
+        /// <summary>
         /// Stores a readonly reference to a binary serializer
         /// </summary>
         private readonly ISerializer<byte[]> binarySerializer;
+
+
+        /// <summary>
+        /// Stores a boolean flag indicating whether the sender is connected to the remote server
+        /// </summary>
+        private bool connected;
 
 
         /// <summary>
@@ -30,25 +42,74 @@ namespace Smoke.NetMQ
         /// </summary>
         /// <param name="requestSocket"></param>
         /// <param name="binarySerializer"></param>
-        public NetMQSender(RequestSocket requestSocket, ISerializer<byte[]> binarySerializer)
+        public NetMQSender(NetMQContext context, ISerializer<byte[]> binarySerializer, String address)
         {
             if (binarySerializer == null)
                 throw new ArgumentNullException("ISerializer<byte[]>");
 
-            if (requestSocket == null)
-                throw new ArgumentNullException("RequestSocket");
+            if (context == null)
+                throw new ArgumentNullException("NetMQContext");
+
+            if (address == null || address == default(String) || address.Length == 0)
+                throw new ArgumentNullException("Address");
+
 
             this.binarySerializer = binarySerializer;
-            this.requestSocket = requestSocket;
+            this.requestSocket = context.CreateRequestSocket();
+            this.address = address;
         }
+
+
+        /// <summary>
+        /// Gets a string of the address that the sender connects to
+        /// </summary>
+        public string Address
+        { get { return address; } }
 
 
         /// <summary>
         /// Gets a flag indicating whether the sender is available and able to send messages to the connected server
         /// </summary>
         public bool Available
+        { get { return true; } }
+
+
+        /// <summary>
+        /// Gets a boolean flag indicating whether the sender is connected
+        /// </summary>
+        public bool Connected
+        { get { return connected; } }
+
+
+        /// <summary>
+        /// Gets a the type of the serializer the sender uses
+        /// </summary>
+        public Type SerializerType
+        { get { return binarySerializer.GetType(); } }
+
+
+        /// <summary>
+        /// Connects the sender to the remote server at the sender's address
+        /// </summary>
+        public void Connect()
         {
-            get { return true; }
+            if (!connected)
+            {
+                requestSocket.Connect(address);
+            }
+        }
+
+
+        /// <summary>
+        /// Disconnects the sender from the remote server
+        /// </summary>
+        public void Disconnect()
+        {
+            if (connected)
+            {
+                requestSocket.Unbind(address);
+                connected = false;
+            }
         }
 
 

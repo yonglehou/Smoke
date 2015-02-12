@@ -19,6 +19,30 @@ namespace Smoke
 
 
         /// <summary>
+        /// Stores a readonly string representing the name of the server instance
+        /// </summary>
+        private readonly String name;
+
+
+        /// <summary>
+        /// Stores a boolean flag indicating whether the server is running
+        /// </summary>
+        private bool running;
+
+
+        /// <summary>
+        /// Stores an object for thread safe operations of the running flag
+        /// </summary>
+        private object runningLock = new {};
+
+
+        /// <summary>
+        /// Stores a DateTime recording the timestamp when the server started running
+        /// </summary>
+        private DateTime startTimestamp;
+
+
+        /// <summary>
         /// Stores a readonly reference to an IReceiverManager
         /// </summary>
         private readonly IReceiverManager receiverManager;
@@ -36,7 +60,7 @@ namespace Smoke
         /// <param name="receiverManager">Manages client connections</param>
         /// <param name="messageFactory">Wraps requests in the Smoke message protocol</param>
         /// <param name="messageHandler">Handles incoming messages</param>
-        public Server(IReceiverManager receiverManager, IMessageFactory messageFactory, IMessageHandler messageHandler)
+        public Server(IReceiverManager receiverManager, IMessageFactory messageFactory, IMessageHandler messageHandler, String name)
         {
             if (messageFactory == null)
                 throw new ArgumentNullException("IMessageFactory");
@@ -47,10 +71,35 @@ namespace Smoke
             if (messageHandler == null)
                 throw new ArgumentNullException("IRequestHandlerFactory");
 
+            if (name == null || name == default(String) || name.Length == 0)
+                throw new ArgumentNullException("Name");
+
             this.messageFactory = messageFactory;
             this.receiverManager = receiverManager;
             this.messageHandler = messageHandler;
+            this.name = name;
         }
+
+
+        /// <summary>
+        /// Gets a string representing the name of the service instance
+        /// </summary>
+        public String Name
+        { get { return name; } }
+
+
+        /// <summary>
+        /// Gets a Boolean flag indicating whether the server is running
+        /// </summary>
+        public bool Running
+        { get { lock (runningLock) return running; } }
+
+
+        /// <summary>
+        /// Gets a DateTime recording the timestamp at which the server started running
+        /// </summary>
+        public DateTime StartTimestamp
+        { get { return startTimestamp; } }
 
 
         /// <summary>
@@ -58,6 +107,17 @@ namespace Smoke
         /// </summary>
         public void Run(CancellationToken cancellationToken)
         {
+            lock (runningLock)
+            {
+                if (running)
+                    throw new InvalidOperationException("Server is already running");
+
+                running = true;
+                startTimestamp = DateTime.Now;
+            }
+
+
+            // Main loop
             do
             {
                 var task = receiverManager.Receive();
@@ -66,6 +126,10 @@ namespace Smoke
                 Thread.Yield();
             }
             while (!cancellationToken.IsCancellationRequested);
+
+            // Set server to not running
+            lock (runningLock)
+                running = false;
         }
 
 
