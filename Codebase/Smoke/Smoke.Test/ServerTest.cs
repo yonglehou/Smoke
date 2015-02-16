@@ -14,6 +14,9 @@ namespace Smoke.Test
     [TestClass]
     public class ServerTest
     {
+		/// <summary>
+		/// Server constructor should correctly initialize, taking dependencies and rejecting null values
+		/// </summary>
         [TestMethod]
         public void Server_Constructor()
         {
@@ -25,6 +28,7 @@ namespace Smoke.Test
 
             var server = new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, name);
 
+			// Assert
             Assert.AreEqual(name, server.Name);
 
             AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactory.Object, messageHandler.Object, name));
@@ -36,6 +40,9 @@ namespace Smoke.Test
         }
 
 
+		/// <summary>
+		/// Sync and async server tests
+		/// </summary>
         [TestMethod]
         public void Server_Run()
         {
@@ -46,6 +53,39 @@ namespace Smoke.Test
         }
 
 
+		/// <summary>
+		/// If the receiver manager returns a null message to process the server shouldn't send it to the message handler
+		/// </summary>
+		[TestMethod]
+		public void Server_NullMessage_NoException()
+		{
+			// Setup
+			var messageHandlerMock = new Mock<IMessageHandler>();
+			var messageFactoryMock = new Mock<IMessageFactory>();
+			var receiverManagerMock = new Mock<IReceiverManager>();
+
+			receiverManagerMock.Setup(m => m.Receive()).Returns(default(RequestTask));
+			messageHandlerMock.Setup(m => m.Handle(It.IsAny<Message>(), It.IsAny<IMessageFactory>())).Throws<Exception>();
+			
+            var cancellationTokenSource = new CancellationTokenSource();
+
+			var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, messageHandlerMock.Object, "TestServer");
+
+			// Run
+			server.Start(cancellationTokenSource.Token);
+			cancellationTokenSource.Cancel();
+
+			// Assert
+			receiverManagerMock.Verify(m => m.Receive(), Times.AtLeastOnce());
+			messageHandlerMock.Verify(m => m.Handle(It.IsAny<Message>(), It.IsAny<IMessageFactory>()), Times.Never);
+		}
+
+
+		/// <summary>
+		/// Test general server operation in a synchronous run
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="receiveObject"></param>
         public void GenericSyncRunTest<T>(T receiveObject)
         {
             // Setup
@@ -81,6 +121,11 @@ namespace Smoke.Test
         }
 
 
+		/// <summary>
+		/// Test general server operation in an asynchronous run
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="receiveObject"></param>
         public void GenericTaskRunTest<T>(T receiveObject)
         {
             // Setup

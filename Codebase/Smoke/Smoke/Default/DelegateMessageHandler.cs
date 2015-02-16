@@ -45,7 +45,10 @@ namespace Smoke.Default
         /// <returns>Response Message</returns>
         public Message Handle(Message request, IMessageFactory messageFactory)
         {
-            return requestHandlers[request.MessageObject.GetType()](request, messageFactory);
+			if (request != null)
+				return requestHandlers[request.MessageObject.GetType()](request, messageFactory);
+			else
+				throw new InvalidOperationException("Message is null");
         }
 
 

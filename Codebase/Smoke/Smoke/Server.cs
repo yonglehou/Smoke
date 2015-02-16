@@ -121,7 +121,9 @@ namespace Smoke
             do
             {
                 var task = receiverManager.Receive();
-                Reply(task.Request, task.ResponseAction);
+
+				if (task.Request != null && task.ResponseAction != null)
+					Reply(task.Request, task.ResponseAction);
 
                 Thread.Yield();
             }
