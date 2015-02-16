@@ -17,7 +17,7 @@ namespace Smoke.NetMQ
         /// <summary>
         /// Stores a readonly reference to a ResponseSocket for network interacton
         /// </summary>
-        private readonly ResponseSocket responseSocket;
+        private readonly RouterSocket routerSocket;
 
 
         /// <summary>
@@ -29,19 +29,29 @@ namespace Smoke.NetMQ
         /// <summary>
         /// Initializes an instance of NetMQReceiver with the specified ResponseSocket and binary ISerializer
         /// </summary>
-        /// <param name="responseSocket">NetMQ ResponseSocket</param>
+        /// <param name="routerSocket">NetMQ ResponseSocket</param>
         /// <param name="binarySerializer">Binary Serializer</param>
-        public NetMQReceiver(ResponseSocket responseSocket, ISerializer<byte[]> binarySerializer)
+        public NetMQReceiver(RouterSocket routerSocket, ISerializer<byte[]> binarySerializer)
         {
-            if (responseSocket == null)
+            if (routerSocket == null)
                 throw new ArgumentNullException("ResponseSocket");
 
             if (binarySerializer == null)
                 throw new ArgumentNullException("ISerializer<byte[]>");
 
-            this.responseSocket = responseSocket;
+            this.routerSocket = routerSocket;
             this.binarySerializer = binarySerializer;
         }
+
+
+		/// <summary>
+		/// Bind the receiver to listen for connections on the specified address
+		/// </summary>
+		/// <param name="address">Address to bind to</param>
+		public void Bind(String address)
+		{
+			routerSocket.Bind(address);
+		}
 
 
         /// <summary>
@@ -52,9 +62,18 @@ namespace Smoke.NetMQ
         {
             try
             {
-                byte[] data = responseSocket.Receive();
+				var requestMessage = routerSocket.ReceiveMessage();
+				var clientAddress = requestMessage[0];
+				byte[] data = requestMessage[2].ToByteArray();
+
                 var message = binarySerializer.Deserialize<Message>(data);
-                Action<Message> reply = m => responseSocket.Send(binarySerializer.Serialize<Message>(m));
+                Action<Message> reply = m => {
+					var responseMessage = new NetMQMessage();
+					responseMessage.Append(clientAddress);
+					responseMessage.AppendEmptyFrame();
+					responseMessage.Append(binarySerializer.Serialize<Message>(m));
+					routerSocket.SendMessage(responseMessage);
+				};
 
                 return new RequestTask(message, reply);
             }

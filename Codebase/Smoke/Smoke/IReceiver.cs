@@ -11,6 +11,12 @@ namespace Smoke
     /// </summary>
     public interface IReceiver
     {
+		/// <summary>
+		/// Bind the receiver to listen for connections on the specified address
+		/// </summary>
+		/// <param name="address">Address to bind to</param>
+		void Bind(String address);
+
         /// <summary>
         /// Retrieves a RequestTask that combines the request Message and an Action to return the response
         /// </summary>

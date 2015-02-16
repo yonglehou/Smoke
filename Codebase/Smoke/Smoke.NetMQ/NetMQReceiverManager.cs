@@ -35,9 +35,8 @@ namespace Smoke.NetMQ
             if (context == null)
                 throw new ArgumentNullException("NetMQContext");
 
-            ResponseSocket socket = context.CreateResponseSocket();
-            socket.Bind(address);
-            this.receiver = new NetMQReceiver(socket, new BinarySerializer());
+            receiver = new NetMQReceiver(context.CreateRouterSocket(), new BinarySerializer());
+			receiver.Bind(address);
         }
 
 

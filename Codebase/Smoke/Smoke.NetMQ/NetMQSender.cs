@@ -34,7 +34,7 @@ namespace Smoke.NetMQ
         /// <summary>
         /// Stores a readonly reference to a NetMQ.Sockets.RequestSocket
         /// </summary>
-        private readonly RequestSocket requestSocket;
+        private readonly DealerSocket dealerSocket;
 
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Smoke.NetMQ
 
 
             this.binarySerializer = binarySerializer;
-            this.requestSocket = context.CreateRequestSocket();
+            this.dealerSocket = context.CreateDealerSocket();
             this.address = address;
         }
 
@@ -95,7 +95,7 @@ namespace Smoke.NetMQ
         {
             if (!connected)
             {
-                requestSocket.Connect(address);
+                dealerSocket.Connect(address);
             }
         }
 
@@ -107,7 +107,7 @@ namespace Smoke.NetMQ
         {
             if (connected)
             {
-                requestSocket.Unbind(address);
+                dealerSocket.Unbind(address);
                 connected = false;
             }
         }
@@ -121,10 +121,21 @@ namespace Smoke.NetMQ
         /// <returns>Response message</returns>
         public Message Send(Message message)
         {
-            byte[] sendData = binarySerializer.Serialize<Message>(message);
-            requestSocket.Send(sendData);
-            byte[] returnData = requestSocket.Receive();
-            return binarySerializer.Deserialize<Message>(returnData);
+			var requestMessage = new NetMQMessage();
+			requestMessage.AppendEmptyFrame();
+			requestMessage.Append(binarySerializer.Serialize<Message>(message));
+
+            dealerSocket.SendMessage(requestMessage);
+
+			var responseMessage = dealerSocket.ReceiveMessage();
+
+			if (responseMessage != null && responseMessage.FrameCount > 0)
+			{
+				byte[] returnData = responseMessage[1].ToByteArray();
+				return binarySerializer.Deserialize<Message>(returnData);
+			}
+			else
+				throw new InvalidOperationException("Response message in incorrect format");
         }
     }
 }
