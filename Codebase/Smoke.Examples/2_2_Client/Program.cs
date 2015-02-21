@@ -61,15 +61,12 @@ namespace _2_2_Client
 
         public static MyClient Create(NetMQContext context)
         {
-            var sender1 = new NetMQSender(context, new BinarySerializer(), "tcp://127.0.0.1:5556");
-            var sender2 = new NetMQSender(context, new BinarySerializer(), "tcp://127.0.0.1:5557");
-
-            sender1.Connect();
-            sender2.Connect();
+            var senderFactory1 = new NetMQSenderFactory("tcp://127.0.0.1:5556", context);
+			var senderFactory2 = new NetMQSenderFactory("tcp://127.0.0.1:5557", context);
 
             var senderManager = SenderManager.Create()
-                                             .Route<App1>(sender1)
-                                             .Route<App2>(sender2);
+                                             .Route<App1>(senderFactory1)
+                                             .Route<App2>(senderFactory2);
 
             return new MyClient(senderManager, new MessageFactory());
         }
