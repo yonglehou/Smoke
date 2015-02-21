@@ -15,17 +15,17 @@ namespace Smoke.Routing
         /// <summary>
         /// Adds a conditional routing to the routing table
         /// </summary>
-        /// <param name="predicate">Predicate to test the routing condition</param>
-        /// <param name="sender">ISender to route requests to given no previous conditions match</param>
+		/// <param name="predicate">Predicate to test the routing condition</param>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
         /// <returns>ISenderSelectorWhen for specifying further conditions</returns>
-        ISenderSelectorWhen<T> When(Func<T, bool> predicate, ISender sender);
+        ISenderSelectorWhen<T> When(Func<T, bool> predicate, ISenderFactory senderFactory);
 
 
         /// <summary>
         /// Adds a default routing to the routing table
-        /// </summary>
-        /// <param name="sender">ISender to route requests to</param>
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
         /// <returns>ISenderSelectorBackup for specifying backup senders should this be unavailable</returns>
-        ISenderSelectorBackup<T> Always(ISender sender);
+        ISenderSelectorBackup<T> Always(ISenderFactory senderFactory);
     }
 }

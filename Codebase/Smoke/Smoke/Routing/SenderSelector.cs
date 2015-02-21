@@ -34,41 +34,41 @@ namespace Smoke.Routing
         /// <summary>
         /// Adds a conditional routing to the routing tree
         /// </summary>
-        /// <param name="predicate">Condition to test request objects with</param>
-        /// <param name="sender">ISender to dispatch requests to</param>
-        public void AddWhen(Func<T, bool> predicate, ISender sender)
+		/// <param name="predicate">Condition to test request objects with</param>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public void AddWhen(Func<T, bool> predicate, ISenderFactory senderFactory)
         {
-            conditionList.Add(new SenderConditionWhen<T>(predicate, sender));
+            conditionList.Add(new SenderConditionWhen<T>(predicate, senderFactory));
         }
 
 
         /// <summary>
         /// Adds a conditional default to the routing tree to use when a request does not match previous conditions
-        /// </summary>
-        /// <param name="sender">ISender to dispatch requests to</param>
-        public void AddElse(ISender sender)
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public void AddElse(ISenderFactory senderFactory)
         {
-            conditionList.Add(new SenderConditionElse<T>(sender));
+            conditionList.Add(new SenderConditionElse<T>(senderFactory));
         }
 
 
         /// <summary>
         /// Adds a default to the routing tree to use for all reqests
-        /// </summary>
-        /// <param name="sender">ISender to dispatch requests to</param>
-        public void AddAlways(ISender sender)
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public void AddAlways(ISenderFactory senderFactory)
         {
-            conditionList.Add(new SenderConditionAlways<T>(sender));
+            conditionList.Add(new SenderConditionAlways<T>(senderFactory));
         }
 
 
         /// <summary>
         /// Adds a backup to the routing tree to use when previous routing matches are not available
-        /// </summary>
-        /// <param name="sender">ISender to dispatch requests to</param>
-        public void AddBackup(ISender sender)
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public void AddBackup(ISenderFactory senderFactory)
         {
-            conditionList.Add(new SenderConditionBackup<T>(sender));
+            conditionList.Add(new SenderConditionBackup<T>(senderFactory));
         }
 
 
@@ -85,7 +85,7 @@ namespace Smoke.Routing
         {
             foreach (var condition in conditionList)
                 if (condition.TestCondition())
-                    return condition.RoutedSender;
+                    return condition.Sender();
 
             throw new ApplicationException("Unable to resolve a sender");
         }
@@ -107,8 +107,8 @@ namespace Smoke.Routing
 
                 if (testResult && (!conditionUnavailable || condition is SenderConditionBackup<T>))
                     // While there hasn't been a conditional unavailable, check only on the rest result, otherwise only look at backups
-                    return condition.RoutedSender;
-                else if (condition is SenderConditionWhen<T> && !condition.RoutedSender.Available)
+                    return condition.Sender();
+                else if (condition is SenderConditionWhen<T> && !condition.Available)
                     // When there is a conditional unavailable, switch to checking only backups
                     conditionUnavailable = true;
             }
@@ -139,8 +139,8 @@ namespace Smoke.Routing
 
                 if (testResult && (!conditionUnavailable || condition is SenderConditionBackup<T>))
                     // While there hasn't been a conditional unavailable, check only on the rest result, otherwise only look at backups
-                    return condition.RoutedSender;
-                else if (condition is SenderConditionWhen<T> && !condition.RoutedSender.Available)
+                    return condition.Sender();
+                else if (condition is SenderConditionWhen<T> && !condition.Available)
                     // When there is a conditional unavailable, switch to checking only backups
                     conditionUnavailable = true;
             }
@@ -159,21 +159,21 @@ namespace Smoke.Routing
         /// <param name="predicate">Predicate to test the routing condition</param>
         /// <param name="sender">ISender to route requests to given no previous conditions match</param>
         /// <returns>ISenderSelectorWhen for specifying further conditions</returns>
-        ISenderSelectorWhen<T> ISenderSelectorCondition<T>.When(Func<T, bool> predicate, ISender sender)
+        ISenderSelectorWhen<T> ISenderSelectorCondition<T>.When(Func<T, bool> predicate, ISenderFactory senderFactory)
         {
-            AddWhen(predicate, sender);
+            AddWhen(predicate, senderFactory);
             return this;
         }
 
 
         /// <summary>
         /// Adds a default routing to the routing table
-        /// </summary>
-        /// <param name="sender">ISender to route requests to</param>
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
         /// <returns>ISenderSelectorBackup for specifying backup senders should this be unavailable</returns>
-        ISenderSelectorBackup<T> ISenderSelectorCondition<T>.Always(ISender sender)
+        ISenderSelectorBackup<T> ISenderSelectorCondition<T>.Always(ISenderFactory senderFactory)
         {
-            AddAlways(sender);
+            AddAlways(senderFactory);
             return this;
         }
 
@@ -184,12 +184,12 @@ namespace Smoke.Routing
 
         /// <summary>
         /// Adds a backup to the routing table
-        /// </summary>
-        /// <param name="sender">ISender to route requests to if previous matches are unavailable</param>
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to when previous matches are not available</param>
         /// <returns>ISenderSelectorBackup for specifying further backups</returns>
-        ISenderSelectorBackup<T> ISenderSelectorBackup<T>.Backup(ISender sender)
+        ISenderSelectorBackup<T> ISenderSelectorBackup<T>.Backup(ISenderFactory senderFactory)
         {
-            AddBackup(sender);
+            AddBackup(senderFactory);
             return this;
         }
 
@@ -201,24 +201,24 @@ namespace Smoke.Routing
         /// <summary>
         /// Adds a conditional routing to the routing table
         /// </summary>
-        /// <param name="predicate">Predicate to test the routing condition</param>
-        /// <param name="sender">ISender to route requests to given no previous conditions match</param>
+		/// <param name="predicate">Predicate to test the routing condition</param>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to given no previous matches</param>
         /// <returns>ISenderSelectorWhen for specifying further conditions</returns>
-        ISenderSelectorWhen<T> ISenderSelectorWhen<T>.When(Func<T, bool> predicate, ISender sender)
+        ISenderSelectorWhen<T> ISenderSelectorWhen<T>.When(Func<T, bool> predicate, ISenderFactory senderFactory)
         {
-            AddWhen(predicate, sender);
+            AddWhen(predicate, senderFactory);
             return this;
         }
 
 
         /// <summary>
         /// Adds a default routing to the routing table to use when previous conditions are not met
-        /// </summary>
-        /// <param name="sender">ISender to route requests to</param>
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
         /// <returns>ISenderSelectorBackup for specifying backup senders should this be unavailable</returns>
-        ISenderSelectorBackup<T> ISenderSelectorWhen<T>.Else(ISender sender)
+        ISenderSelectorBackup<T> ISenderSelectorWhen<T>.Else(ISenderFactory senderFactory)
         {
-            AddElse(sender);
+            AddElse(senderFactory);
             return this;
         }
 

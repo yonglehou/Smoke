@@ -18,22 +18,27 @@ namespace Smoke.Test.Defaults
         public void SenderManager_BasicRouting()
         {
             // Setup
-            var sender1 = new MockSender();
-            var sender2 = new MockSender();
+			var senderFactory1Mock = new Mock<ISenderFactory>();
+            var senderFactory2Mock = new Mock<ISenderFactory>();
 
             var senderManager = SenderManager.Create()
-                                             .Route<int>(sender1)
-                                             .Route<DateTime>(sender2)
-                                             .Route<App1>(sender1)
-                                             .Route<App2>(sender2);
+                                             .Route<int>(senderFactory1Mock.Object)
+                                             .Route<DateTime>(senderFactory2Mock.Object)
+                                             .Route<App1>(senderFactory1Mock.Object)
+											 .Route<App2>(senderFactory2Mock.Object);
+
+			senderFactory1Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory1Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory2Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory2Mock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
-            Assert.AreEqual(sender1, senderManager.ResolveSender<int>());
-            Assert.AreEqual(sender2, senderManager.ResolveSender<DateTime>());
-            Assert.AreEqual(sender1, senderManager.ResolveSender<App1Request1>());
-            Assert.AreEqual(sender1, senderManager.ResolveSender<App1Request2>());
-            Assert.AreEqual(sender2, senderManager.ResolveSender<App2Request1>());
-            Assert.AreEqual(sender2, senderManager.ResolveSender<App2Request2>());
+            Assert.IsNotNull(senderManager.ResolveSender<int>());
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			Assert.IsNotNull(senderManager.ResolveSender<App1Request1>());
+			Assert.IsNotNull(senderManager.ResolveSender<App1Request2>());
+			Assert.IsNotNull(senderManager.ResolveSender<App2Request1>());
+			Assert.IsNotNull(senderManager.ResolveSender<App2Request2>());
 
             AssertException.Throws<InvalidOperationException>(() => senderManager.ResolveSender<Guid>());
             AssertException.Throws<InvalidOperationException>(() => senderManager.ResolveSender<Guid>(Guid.NewGuid()));
@@ -45,17 +50,59 @@ namespace Smoke.Test.Defaults
         {
             // Setup
             var senderManager = new SenderManager();
-            var sender1 = new MockSender();
-            var sender2 = new MockSender();
-            var sender3 = new MockSender();
-            var sender4 = new MockSender();
+			var senderFactory1Mock = new Mock<ISenderFactory>();
+			var senderFactory2Mock = new Mock<ISenderFactory>();
+			var senderFactory3Mock = new Mock<ISenderFactory>();
+			var senderFactory4Mock = new Mock<ISenderFactory>();
 
-            senderManager.Route<DateTime>(sender1, sender2, sender3, sender4);
+			senderManager.Route<DateTime>(senderFactory1Mock.Object,
+										  senderFactory2Mock.Object,
+										  senderFactory3Mock.Object,
+										  senderFactory4Mock.Object);
+
+			senderFactory1Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory1Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory2Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory2Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory3Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory3Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory4Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory4Mock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
-            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>());
+            Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
 
-            // Can't test the backups yet. Need to expand this later
+
+			senderFactory1Mock.SetupGet(m => m.Available).Returns(false);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
+
+
+			senderFactory2Mock.SetupGet(m => m.Available).Returns(false);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
+
+			senderFactory3Mock.SetupGet(m => m.Available).Returns(false);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Once);
+
+
         }
 
 
@@ -66,24 +113,57 @@ namespace Smoke.Test.Defaults
         public void SenderManager_TestConditionalRouting()
         {
             // Setup
-            var senderManager = new SenderManager();
-            var sender1 = new MockSender();
-            var sender2 = new MockSender();
-            var sender3 = new MockSender();
-            var sender4 = new MockSender();
+			var senderManager = new SenderManager();
+			var senderFactory1Mock = new Mock<ISenderFactory>();
+			var senderFactory2Mock = new Mock<ISenderFactory>();
+			var senderFactory3Mock = new Mock<ISenderFactory>();
+			var senderFactory4Mock = new Mock<ISenderFactory>();
 
-            senderManager.Route<DateTime>().When(dt => dt.Year == 2015, sender1)
-                                           .When(dt => dt.Year == 2016, sender2)
-                                           .When(dt => dt.Year == 2017, sender3)
-                                           .Else(sender4);
+            senderManager.Route<DateTime>().When(dt => dt.Year == 2015, senderFactory1Mock.Object)
+										   .When(dt => dt.Year == 2016, senderFactory2Mock.Object)
+										   .When(dt => dt.Year == 2017, senderFactory3Mock.Object)
+										   .Else(senderFactory4Mock.Object);
+
+			senderFactory1Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory1Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory2Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory2Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory3Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory3Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory4Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory4Mock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
-            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>(new DateTime(2015, 02, 02)));
-            Assert.AreEqual(sender2, senderManager.ResolveSender<DateTime>(new DateTime(2016, 03, 03)));
-            Assert.AreEqual(sender3, senderManager.ResolveSender<DateTime>(new DateTime(2017, 04, 04)));
-            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>(new DateTime(2014, 01, 01)));
-            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>(new DateTime(2018, 01, 01)));
-            Assert.AreEqual(sender4, senderManager.ResolveSender<DateTime>());
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(new DateTime(2015, 02, 02)));
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(new DateTime(2016, 03, 03)));
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Never);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(new DateTime(2017, 04, 04)));
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Never);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(new DateTime(2014, 01, 01)));
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.Once);
+
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(new DateTime(2018, 01, 01)));
+			senderFactory1Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory2Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory3Mock.Verify(m => m.Sender(), Times.Once);
+			senderFactory4Mock.Verify(m => m.Sender(), Times.AtLeastOnce);
+
         }
 
 
@@ -94,15 +174,20 @@ namespace Smoke.Test.Defaults
         public void SenderManager_AlwaysRouting()
         {
             // Setup
-            var senderManager = new SenderManager();
-            var sender1 = new MockSender();
-            var sender2 = new MockSender();
+			var senderManager = new SenderManager();
+			var senderFactory1Mock = new Mock<ISenderFactory>();
+			var senderFactory2Mock = new Mock<ISenderFactory>();
 
-            senderManager.Route<DateTime>().Always(sender1).Backup(sender2);
+			senderManager.Route<DateTime>().Always(senderFactory1Mock.Object).Backup(senderFactory2Mock.Object);
+
+			senderFactory1Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory1Mock.Setup(m => m.Sender()).Returns(new MockSender());
+			senderFactory2Mock.SetupGet(m => m.Available).Returns(true);
+			senderFactory2Mock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
-            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>());
-            Assert.AreEqual(sender1, senderManager.ResolveSender<DateTime>(DateTime.Now));
+            Assert.IsNotNull(senderManager.ResolveSender<DateTime>());
+			Assert.IsNotNull(senderManager.ResolveSender<DateTime>(DateTime.Now));
         }
     }
 }

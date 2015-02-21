@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Smoke.Default;
+using Smoke.Test.TestExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,8 +61,16 @@ namespace Smoke.Test.Defaults
             // Assert
             Assert.AreEqual(dt.AddDays(1), response.MessageObject);
         }
+
+
+		[TestMethod]
+		public void DelegateMessageHandler_NullMessage()
+		{
+            // Setup
+            var messageFactoryMock = new Mock<IMessageFactory>();
+			var delegateMessageHandler = DelegateMessageHandler.Create();
+
+			AssertException.Throws<InvalidOperationException>(() => delegateMessageHandler.Handle(null, messageFactoryMock.Object));
+		}
     }
-
-
-
 }

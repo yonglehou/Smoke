@@ -26,10 +26,10 @@ namespace Smoke.NetMQ
         /// <param name="context"></param>
         public NetMQSenderManager(NetMQContext context, String address)
         {
-            var sender = new NetMQSender(context, new BinarySerializer(), address);
+            var sender = new NetMQSender(context.CreateDealerSocket(), new BinarySerializer(), address);
             sender.Connect();
 
-            Route<object>(sender);
+            Route<object>(new NetMQSenderFactory(address, context));
         }
     }
 }

@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Default\SenderManager.cs" />
+    <Compile Include="ISenderFactory.cs" />
     <Compile Include="Routing\ISenderCondition.cs" />
     <Compile Include="Routing\ISenderResolver.cs" />
     <Compile Include="Routing\ISenderSelectorBackup.cs" />

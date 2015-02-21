@@ -14,27 +14,35 @@ namespace Smoke.Test.Routing
         public void SenderConditionBackup_Construction()
         {
             // Setup
-            var senderMock = new MockSender();
-            var senderConditionBackup = new SenderConditionBackup<DateTime>(senderMock);
+            var senderFactoryMock = new Mock<ISenderFactory>();
+			var senderConditionBackup = new SenderConditionBackup<DateTime>(senderFactoryMock.Object);
+			senderFactoryMock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
             AssertException.Throws<ArgumentNullException>(() => new SenderConditionBackup<DateTime>(null));
-            Assert.AreEqual(senderMock, senderConditionBackup.RoutedSender);
+			Assert.IsNotNull(senderConditionBackup.Sender());
+
+			senderFactoryMock.SetupGet(m => m.Available).Returns(true);
+			Assert.IsTrue(senderConditionBackup.Available);
+
+			senderFactoryMock.SetupGet(m => m.Available).Returns(false);
+			Assert.IsFalse(senderConditionBackup.Available);
         }
 
 
         [TestMethod]
         public void SenderConditionBackup_Condition()
         {
-            // Setup
-            var senderMock = new MockSender();
-            var senderConditionBackup = new SenderConditionBackup<DateTime>(senderMock);
+			// Setup
+			var senderFactoryMock = new Mock<ISenderFactory>();
+			var senderConditionBackup = new SenderConditionBackup<DateTime>(senderFactoryMock.Object);
+			senderFactoryMock.SetupGet(m => m.Available).Returns(true);
 
             // Run & Assert
             Assert.IsTrue(senderConditionBackup.TestCondition());
             Assert.IsTrue(senderConditionBackup.TestCondition(DateTime.Now));
 
-            senderMock.Available = false;
+			senderFactoryMock.SetupGet(m => m.Available).Returns(false);
 
             Assert.IsFalse(senderConditionBackup.TestCondition());
             Assert.IsFalse(senderConditionBackup.TestCondition(DateTime.Now));

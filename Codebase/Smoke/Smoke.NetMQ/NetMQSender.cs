@@ -42,20 +42,20 @@ namespace Smoke.NetMQ
         /// </summary>
         /// <param name="requestSocket"></param>
         /// <param name="binarySerializer"></param>
-        public NetMQSender(NetMQContext context, ISerializer<byte[]> binarySerializer, String address)
+		public NetMQSender(DealerSocket dealerSocket, ISerializer<byte[]> binarySerializer, String address)
         {
             if (binarySerializer == null)
                 throw new ArgumentNullException("ISerializer<byte[]>");
 
-            if (context == null)
-                throw new ArgumentNullException("NetMQContext");
+            if (dealerSocket == null)
+                throw new ArgumentNullException("DealerSocket");
 
             if (address == null || address == default(String) || address.Length == 0)
                 throw new ArgumentNullException("Address");
 
 
             this.binarySerializer = binarySerializer;
-            this.dealerSocket = context.CreateDealerSocket();
+			this.dealerSocket = dealerSocket;
             this.address = address;
         }
 

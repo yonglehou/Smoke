@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Smoke.Test.TestExtensions
     public static class AssertException
     {
         //ncrunch: no coverage start
+		[DebuggerStepThrough]
         public static T Throws<T>(Action action) where T : Exception
         {
             try

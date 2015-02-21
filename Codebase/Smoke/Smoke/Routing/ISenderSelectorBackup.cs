@@ -15,8 +15,8 @@ namespace Smoke.Routing
         /// <summary>
         /// Adds a backup to the routing table
         /// </summary>
-        /// <param name="sender">ISender to route requests to if previous matches are unavailable</param>
+        /// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
         /// <returns>ISenderSelectorBackup for specifying further backups</returns>
-        ISenderSelectorBackup<T> Backup(ISender sender);
+        ISenderSelectorBackup<T> Backup(ISenderFactory senderFactory);
     }
 }

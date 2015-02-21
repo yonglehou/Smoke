@@ -68,13 +68,13 @@ namespace Smoke.Default
         /// Registers the specified type with the specified sender. Subtypes are caught unless there is an
         /// alternative routing specified before this function call in the routing setup
         /// </summary>
-        /// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
-        /// <param name="sender">Sender to route requests to by default</param>
+		/// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to by default</param>
         /// <returns>SenderManager for fluency</returns>
-        public SenderManager Route<T>(ISender sender)
+        public SenderManager Route<T>(ISenderFactory senderFactory)
         {
             var senderSelector = new SenderSelector<T>();
-            senderSelector.AddAlways(sender);
+            senderSelector.AddAlways(senderFactory);
             routingTable.Add(typeof(T), senderSelector);
             return this;
         }
@@ -84,16 +84,16 @@ namespace Smoke.Default
         /// Registers the specified type with a default sender, and then backups in order. Subtypes are caught
         /// unless there is an alternative routing specified before this function call in the routing setup
         /// </summary>
-        /// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
-        /// <param name="sender">Sender to route request to by default</param>
-        /// <param name="backups">Senders to route request to in order if the previous or default is unavailable</param>
+		/// <typeparam name="T">Type of request to register, catches all subtypes</typeparam>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to by default</param>
+		/// <param name="backupFactories">ISenderFactory that creates a sender to route request to in order if the previous or default is unavailable</param>
         /// <returns>SenderManager for fluency</returns>
-        public SenderManager Route<T>(ISender sender, params ISender[] backups)
+        public SenderManager Route<T>(ISenderFactory senderFactory, params ISenderFactory[] backupFactories)
         {
             var senderSelector = new SenderSelector<T>();
-            senderSelector.AddAlways(sender);
+            senderSelector.AddAlways(senderFactory);
 
-            foreach (var backup in backups)
+            foreach (var backup in backupFactories)
                 senderSelector.AddBackup(backup);
 
             routingTable.Add(typeof(T), senderSelector);

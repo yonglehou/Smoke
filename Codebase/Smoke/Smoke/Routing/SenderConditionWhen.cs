@@ -16,7 +16,7 @@ namespace Smoke.Routing
         /// <summary>
         /// Stores a readonly reference to a sender to route to when the condition is met
         /// </summary>
-        private readonly ISender sender;
+        private readonly ISenderFactory senderFactory;
 
 
         /// <summary>
@@ -28,19 +28,26 @@ namespace Smoke.Routing
         /// <summary>
         /// Initializes a new instance of SenderConditionWhen with the specified predicate and sender
         /// </summary>
-        /// <param name="predicate">Condition to test request objects with</param>
-        /// <param name="sender">ISender to route requests to if the pass the condition</param>
-        public SenderConditionWhen(Func<T, bool> predicate, ISender sender)
+		/// <param name="predicate">Condition to test request objects with</param>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public SenderConditionWhen(Func<T, bool> predicate, ISenderFactory senderFactory)
         {
             if (predicate == null)
                 throw new ArgumentNullException("Predicate");
 
-            if (sender == null)
-                throw new ArgumentNullException("ISender");
+            if (senderFactory == null)
+                throw new ArgumentNullException("ISenderFactory");
 
             this.predicate = predicate;
-            this.sender = sender;
+            this.senderFactory = senderFactory;
         }
+
+
+		/// <summary>
+		/// Gets a bool flag indicating whether the sender is available for construction
+		/// </summary>
+		public bool Available
+		{ get { return senderFactory.Available; } }
 
 
         /// <summary>
@@ -60,16 +67,16 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition(T obj)
         {
-            return predicate(obj) && sender.Available;
+			return predicate(obj) && senderFactory.Available;
         }
 
 
-        /// <summary>
-        /// Gets the instance of ISender that this condition resolves to
-        /// </summary>
-        public ISender RoutedSender
+		/// <summary>
+		/// Creates a new instance of an ISender
+		/// </summary>
+        public ISender Sender()
         {
-            get { return sender; }
+            return senderFactory.Sender();
         }
     }
 }

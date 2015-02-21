@@ -13,22 +13,31 @@ namespace Smoke.Test.Routing
         [TestMethod]
         public void SenderConditionWhen_Construction()
         {
-            var senderMock = new MockSender();
-            var senderConditionWhen = new SenderConditionWhen<DateTime>(dt => true, senderMock);
+			// Setup
+            var senderFactoryMock = new Mock<ISenderFactory>();
+			var senderConditionWhen = new SenderConditionWhen<DateTime>(dt => true, senderFactoryMock.Object);
+			senderFactoryMock.Setup(m => m.Sender()).Returns(new MockSender());
 
             // Run & Assert
             AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(d => true, null));
-            AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(null, senderMock));
-            Assert.AreEqual(senderMock, senderConditionWhen.RoutedSender);
+            AssertException.Throws<ArgumentNullException>(() => new SenderConditionWhen<DateTime>(null, senderFactoryMock.Object));
+			Assert.IsNotNull(senderConditionWhen.Sender());
+
+			senderFactoryMock.SetupGet(m => m.Available).Returns(true);
+			Assert.IsTrue(senderConditionWhen.Available);
+
+			senderFactoryMock.SetupGet(m => m.Available).Returns(false);
+			Assert.IsFalse(senderConditionWhen.Available);
         }
 
 
         [TestMethod]
         public void SenderConditionWhen_Condition()
         {
-            // Setup
-            var sender1Mock = new MockSender();
-            var senderConditionWhen = new SenderConditionWhen<DateTime>(d => d.Year % 3 == 0, sender1Mock);
+			// Setup
+			var senderFactoryMock = new Mock<ISenderFactory>();
+			var senderConditionWhen = new SenderConditionWhen<DateTime>(d => d.Year % 3 == 0, senderFactoryMock.Object);
+			senderFactoryMock.SetupGet(m => m.Available).Returns(true);
 
             // Run & Assert
             Assert.IsFalse(senderConditionWhen.TestCondition());
@@ -42,7 +51,7 @@ namespace Smoke.Test.Routing
                 Assert.IsFalse(senderConditionWhen.TestCondition(dt.AddYears(++i)));
             }
 
-            sender1Mock.Available = false;
+			senderFactoryMock.SetupGet(m => m.Available).Returns(false);
 
             for (int i = 0; i < 20; i++)
                 Assert.IsFalse(senderConditionWhen.TestCondition(dt.AddYears(i)));

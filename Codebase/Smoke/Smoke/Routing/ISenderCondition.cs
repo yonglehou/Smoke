@@ -12,26 +12,20 @@ namespace Smoke.Routing
     /// route
     /// </summary>
     /// <typeparam name="T">Type of request object to route</typeparam>
-    public interface ISenderCondition<T>
-    {
-        /// <summary>
-        /// Tests the condition 
-        /// </summary>
-        /// <returns>Truth flag</returns>
-        bool TestCondition();
+    public interface ISenderCondition<T> : ISenderFactory
+	{
+		/// <summary>
+		/// Tests the condition 
+		/// </summary>
+		/// <returns>Truth flag</returns>
+		bool TestCondition();
 
 
-        /// <summary>
-        /// Tests the condition given the specified request object
-        /// </summary>
-        /// <param name="obj">Instance of request object to test the condition against</param>
-        /// <returns>Truth flag</returns>
-        bool TestCondition(T obj);
-
-
-        /// <summary>
-        /// Gets the instance of ISender that this condition resolves to
-        /// </summary>
-        ISender RoutedSender { get; }
+		/// <summary>
+		/// Tests the condition given the specified request object
+		/// </summary>
+		/// <param name="obj">Instance of request object to test the condition against</param>
+		/// <returns>Truth flag</returns>
+		bool TestCondition(T obj);
     }
 }

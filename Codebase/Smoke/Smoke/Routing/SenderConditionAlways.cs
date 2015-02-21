@@ -15,20 +15,27 @@ namespace Smoke.Routing
         /// <summary>
         /// Stores a readonly reference to the sender that this condition routes to
         /// </summary>
-        private readonly ISender sender;
+        private readonly ISenderFactory senderFactory;
 
 
         /// <summary>
         /// Initializes a new instance of SenderConditionAlways with the specified ISender
-        /// </summary>
-        /// <param name="sender">ISender to route route requests to</param>
-        public SenderConditionAlways(ISender sender)
+		/// </summary>
+		/// <param name="senderFactory">ISenderFactory that creates a sender to route requests to</param>
+        public SenderConditionAlways(ISenderFactory senderFactory)
         {
-            if (sender == null)
-                throw new ArgumentNullException("ISender");
+            if (senderFactory == null)
+                throw new ArgumentNullException("ISenderFactory");
 
-            this.sender = sender;
+            this.senderFactory = senderFactory;
         }
+
+
+		/// <summary>
+		/// Gets a bool flag indicating whether the sender is available for construction
+		/// </summary>
+		public bool Available
+		{ get { return senderFactory.Available; } }
 
 
         /// <summary>
@@ -37,7 +44,7 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition()
         {
-            return sender.Available;
+			return senderFactory.Available;
         }
 
 
@@ -48,16 +55,16 @@ namespace Smoke.Routing
         /// <returns>Truth flag</returns>
         public bool TestCondition(T obj)
         {
-            return sender.Available;
+			return senderFactory.Available;
         }
 
 
-        /// <summary>
-        /// Gets the instance of ISender that this condition resolves to
-        /// </summary>
-        public ISender RoutedSender
+		/// <summary>
+		/// Creates a new instance of an ISender
+		/// </summary>
+        public ISender Sender()
         {
-            get { return sender; }
+            return senderFactory.Sender();
         }
     }
 }
