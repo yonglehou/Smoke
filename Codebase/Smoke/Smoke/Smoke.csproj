@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Default\SenderManager.cs" />
     <Compile Include="ISenderFactory.cs" />
+    <Compile Include="IServerInfo.cs" />
     <Compile Include="Routing\ISenderCondition.cs" />
     <Compile Include="Routing\ISenderResolver.cs" />
     <Compile Include="Routing\ISenderSelectorBackup.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Default\DelegateMessageHandler.cs" />
     <Compile Include="RequestTask.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="ServerInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

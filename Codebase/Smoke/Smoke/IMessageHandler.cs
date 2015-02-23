@@ -19,6 +19,13 @@ namespace Smoke
         /// <param name="messageFactory">Factory for extracting request and creating response Messages</param>
         /// <returns>Response Message</returns>
         Message Handle(Message request, IMessageFactory messageFactory);
+
+
+        /// <summary>
+        /// Initializes the message handler giving it a reference to the server
+        /// </summary>
+        /// <param name="server">Parent server</param>
+        void Init(IServer server);
     }
 
 

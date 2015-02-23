@@ -41,6 +41,9 @@
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="NetMQ">
+      <HintPath>..\packages\NetMQ.3.3.0.11\lib\net40\NetMQ.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -85,6 +88,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Smoke.NetMQ\Smoke.NetMQ.csproj">
+      <Project>{1d25750d-971a-43f3-890c-e62da8f3561c}</Project>
+      <Name>Smoke.NetMQ</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Smoke\Smoke.csproj">
       <Project>{1a57242b-9af1-4e4a-8e93-0580c21c26bd}</Project>
       <Name>Smoke</Name>

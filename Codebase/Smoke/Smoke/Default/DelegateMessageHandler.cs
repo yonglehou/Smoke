@@ -38,6 +38,12 @@ namespace Smoke.Default
 
 
         /// <summary>
+        /// Stores a reference to the server
+        /// </summary>
+        private IServer server;
+
+
+        /// <summary>
         /// Dispatches the handling of a message to a matching stored request handler functions
         /// </summary>
         /// <param name="request">Request object or object graph root</param>
@@ -49,6 +55,19 @@ namespace Smoke.Default
 				return requestHandlers[request.MessageObject.GetType()](request, messageFactory);
 			else
 				throw new InvalidOperationException("Message is null");
+        }
+
+
+        /// <summary>
+        /// Initializes the message handler giving it a reference to the server
+        /// </summary>
+        /// <param name="server">Parent server</param>
+        public void Init(IServer server)
+        {
+            if (server == null)
+                throw new ArgumentNullException("IServer");
+
+            this.server = server;
         }
 
 

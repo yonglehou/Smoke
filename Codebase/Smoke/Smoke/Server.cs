@@ -12,16 +12,13 @@ namespace Smoke
     /// </summary>
     public class Server : IServer
     {
+        #region Members
+
+
         /// <summary>
         /// Stores a readonly reference to an IMessageFactory
         /// </summary>
         private readonly IMessageFactory messageFactory;
-
-
-        /// <summary>
-        /// Stores a readonly string representing the name of the server instance
-        /// </summary>
-        private readonly String name;
 
 
         /// <summary>
@@ -34,6 +31,12 @@ namespace Smoke
         /// Stores an object for thread safe operations of the running flag
         /// </summary>
         private object runningLock = new {};
+
+
+        /// <summary>
+        /// Stores a readonly reference to a ServerInfo that tracks server stats
+        /// </summary>
+        private readonly ServerInfo serverInfo = new ServerInfo();
 
 
         /// <summary>
@@ -52,6 +55,10 @@ namespace Smoke
         /// Stores a readonly reference to an IMessageHandler
         /// </summary>
         private readonly IMessageHandler messageHandler;
+
+
+        #endregion
+        #region Constructor
 
 
         /// <summary>
@@ -77,15 +84,12 @@ namespace Smoke
             this.messageFactory = messageFactory;
             this.receiverManager = receiverManager;
             this.messageHandler = messageHandler;
-            this.name = name;
+            this.serverInfo.Name = name;
         }
 
 
-        /// <summary>
-        /// Gets a string representing the name of the service instance
-        /// </summary>
-        public String Name
-        { get { return name; } }
+        #endregion
+        #region Properties
 
 
         /// <summary>
@@ -96,10 +100,21 @@ namespace Smoke
 
 
         /// <summary>
+        /// Gets the ServerInfo
+        /// </summary>
+        public IServerInfo ServerInfo
+        { get { return serverInfo; } }
+
+
+        /// <summary>
         /// Gets a DateTime recording the timestamp at which the server started running
         /// </summary>
         public DateTime StartTimestamp
         { get { return startTimestamp; } }
+
+
+        #endregion
+        #region Methods
 
 
         /// <summary>
@@ -115,6 +130,8 @@ namespace Smoke
                 running = true;
                 startTimestamp = DateTime.Now;
             }
+
+            messageHandler.Init(this);
 
 
             // Main loop
@@ -158,5 +175,8 @@ namespace Smoke
             var responseMessage = messageHandler.Handle(requestMessage, messageFactory);
             respondAction(responseMessage);
         }
+
+
+        #endregion
     }
 }

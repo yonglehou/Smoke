@@ -29,7 +29,7 @@ namespace Smoke.Test
             var server = new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, name);
 
 			// Assert
-            Assert.AreEqual(name, server.Name);
+            Assert.AreEqual(name, server.ServerInfo.Name);
 
             AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactory.Object, messageHandler.Object, name));
             AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, null, messageHandler.Object, name));

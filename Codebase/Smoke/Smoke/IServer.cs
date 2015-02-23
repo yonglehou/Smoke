@@ -13,15 +13,15 @@ namespace Smoke
     public interface IServer
     {
         /// <summary>
-        /// Gets a String representing the name of the service instance
-        /// </summary>
-        String Name { get; }
-
-
-        /// <summary>
         /// Gets a Boolean flag indicating whether the server is running
         /// </summary>
         bool Running { get; }
+
+
+        /// <summary>
+        /// Gets the ServerInfo
+        /// </summary>
+        IServerInfo ServerInfo { get; }
 
 
         /// <summary>

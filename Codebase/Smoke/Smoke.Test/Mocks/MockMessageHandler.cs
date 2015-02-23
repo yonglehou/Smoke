@@ -12,5 +12,9 @@ namespace Smoke.Test.Mocks
         {
             return request;
         }
+
+
+        public void Init(IServer server)
+        { }
     }
 }
