@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,9 +53,9 @@ namespace Smoke
 
 
         /// <summary>
-        /// Stores a readonly reference to an IMessageHandler
+        /// Stores a readonly reference to an IRequestDispatcher
         /// </summary>
-        private readonly IMessageHandler messageHandler;
+        private readonly IRequestDispatcher requestDispatcher;
 
 
         #endregion
@@ -62,12 +63,13 @@ namespace Smoke
 
 
         /// <summary>
-        /// Initializes a new instance of a Server composed of the specified IReceiverManager to receive client connections, IMessageFactory to wrap requests in the Smoke message protocol and IMessageHandler to handle incoming messages
+        /// Initializes a new instance of a Server composed of the specified IReceiverManager to receive client connections,
+        /// IMessageFactory to wrap requests in the Smoke message protocol and IRequestDispatcher to handle incoming messages
         /// </summary>
         /// <param name="receiverManager">Manages client connections</param>
         /// <param name="messageFactory">Wraps requests in the Smoke message protocol</param>
-        /// <param name="messageHandler">Handles incoming messages</param>
-        public Server(IReceiverManager receiverManager, IMessageFactory messageFactory, IMessageHandler messageHandler, String name)
+        /// <param name="requestDispatcher">Handles incoming messages</param>
+        public Server(IReceiverManager receiverManager, IMessageFactory messageFactory, IRequestDispatcher requestDispatcher, String name)
         {
             if (messageFactory == null)
                 throw new ArgumentNullException("IMessageFactory");
@@ -75,7 +77,7 @@ namespace Smoke
             if (receiverManager == null)
                 throw new ArgumentNullException("IReceiverManager");
 
-            if (messageHandler == null)
+            if (requestDispatcher == null)
                 throw new ArgumentNullException("IRequestHandlerFactory");
 
             if (name == null || name == default(String) || name.Length == 0)
@@ -83,13 +85,37 @@ namespace Smoke
 
             this.messageFactory = messageFactory;
             this.receiverManager = receiverManager;
-            this.messageHandler = messageHandler;
+            this.requestDispatcher = requestDispatcher;
             this.serverInfo.Name = name;
+
+            // Initialize dependencies
+            requestDispatcher.Init(this);
         }
 
 
         #endregion
         #region Properties
+
+
+        /// <summary>
+        /// Gets the server's MessageFactory
+        /// </summary>
+        internal IMessageFactory MessageFactory
+        { get { return messageFactory; } }
+
+
+        /// <summary>
+        /// Gets the server's IRequestDispatcher
+        /// </summary>
+        internal IRequestDispatcher RequestDispatcher
+        { get { return requestDispatcher; } }
+
+
+        /// <summary>
+        /// Gets the server's ReceiverManager
+        /// </summary>
+        internal IReceiverManager ReceiverManager
+        { get { return receiverManager; } }
 
 
         /// <summary>
@@ -131,7 +157,7 @@ namespace Smoke
                 startTimestamp = DateTime.Now;
             }
 
-            messageHandler.Init(this);
+            requestDispatcher.Init(this);
 
 
             // Main loop
@@ -172,8 +198,26 @@ namespace Smoke
         /// <param name="respondAction"></param>
         public void Reply(Message requestMessage, Action<Message> respondAction)
         {
-            var responseMessage = messageHandler.Handle(requestMessage, messageFactory);
+            var requestObject = messageFactory.ExtractRequest(requestMessage);
+            var responseObject = requestDispatcher.Handle(requestObject);
+            var responseMessage = CreateResponse(responseObject);
             respondAction(responseMessage);
+        }
+
+
+        /// <summary>
+        /// Creates a response Message of the expected type by 
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public Message CreateResponse(object response)
+        {
+            MethodInfo createResponse = typeof(IMessageFactory).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                                                               .Single(m => m.Name == "CreateResponse");
+
+            var genericCreateReponse = createResponse.MakeGenericMethod(response.GetType());
+
+            return (Message)genericCreateReponse.Invoke(messageFactory, new object[] { response });
         }
 
 

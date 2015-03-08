@@ -20,13 +20,13 @@ namespace _2_2_App1Server
             {
                 var receiverManager = new NetMQReceiverManager(context, "tcp://127.0.0.1:5556");
                 var messageFactory = new MessageFactory();
-                var messageHandler = DelegateMessageHandler.Create()
-                                                           .Register<App1RandomNumberRequest, App1RandomNumberResponse>(request =>
-                                                           {
-                                                               Console.WriteLine("Received request for random number between {0} and {1}", request.MinBound, request.MaxBound);
-                                                               var random = new Random();
-                                                               return new App1RandomNumberResponse(random.Next(request.MinBound, request.MaxBound));
-                                                           });
+                var messageHandler = RequestDispatcher.Create()
+                                                      .Register<App1RandomNumberRequest, App1RandomNumberResponse>(request =>
+                                                      {
+                                                          Console.WriteLine("Received request for random number between {0} and {1}", request.MinBound, request.MaxBound);
+                                                          var random = new Random();
+                                                          return new App1RandomNumberResponse(random.Next(request.MinBound, request.MaxBound));
+                                                      });
 
                 IServer server = new Server(receiverManager, messageFactory, messageHandler, "ExampleServer");
 

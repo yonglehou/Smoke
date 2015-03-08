@@ -13,9 +13,9 @@ namespace Smoke
     /// Messages are pure data structures that do not have any direct behaviour of their own, but can define method to
     /// make their handling and extracting wrapped data easier. Messages should encapsulate data required for the communication
     /// process, but nothing more than a reference to any domain object. This base message shouldn't have any direct handling
-    /// by IMessageHandlers, but should be subclassed to allow inheritance to imply responsibility to handlers. Framework
+    /// by IRequestDispatcher, but should be subclassed to allow inheritance to imply responsibility to handlers. Framework
     /// clients can extend the communication portion of the framework by defining their own subclasses and associated
-    /// handling in IMessageHandlers. Messages are immutable and uniquely identified by Guid's to ensure state consistency
+    /// handling in IRequestDispatchers. Messages are immutable and uniquely identified by Guid's to ensure state consistency
     /// across distributed architectures and for thread safety.
     /// </summary>
     [Serializable]

@@ -17,10 +17,10 @@ namespace Smoke.Sandbox
             using (var context = NetMQContext.Create())
             {
                 var messageFactory = new MessageFactory();
-                var messageHandler = DelegateMessageHandler.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
+                var requestDispatcher = RequestDispatcher.Create().Register<RandomNumberRequest, int>(new RandomNumberRequestHandler());
                 var name = "ServerName";
 
-                Server server = new Server(new NetMQReceiverManager(context, "tcp://127.0.0.1:5556"), messageFactory, messageHandler, name);
+                Server server = new Server(new NetMQReceiverManager(context, "tcp://127.0.0.1:5556"), messageFactory, requestDispatcher, name);
                 Client client = new Client(new NetMQSenderManager(context, "tcp://127.0.0.1:5556"), messageFactory);
 
                 var cancellationTokenSource = new CancellationTokenSource();

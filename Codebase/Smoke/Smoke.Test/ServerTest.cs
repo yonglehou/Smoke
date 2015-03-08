@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Smoke.Default;
 using Smoke.Test.Mocks;
 using Smoke.Test.TestExtensions;
 using System;
@@ -21,22 +22,22 @@ namespace Smoke.Test
         public void Server_Constructor()
         {
             // Setup
-            var messageHandler = new Mock<IMessageHandler>();
-            var messageFactory = new Mock<IMessageFactory>();
-            var receiverManager = new Mock<IReceiverManager>();
+            var requestDispatcherMock = new Mock<IRequestDispatcher>();
+            var messageFactoryMock = new Mock<IMessageFactory>();
+            var receiverManagerMock = new Mock<IReceiverManager>();
             var name = "TestServer";
 
-            var server = new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, name);
+            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, requestDispatcherMock.Object, name);
 
 			// Assert
             Assert.AreEqual(name, server.ServerInfo.Name);
 
-            AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactory.Object, messageHandler.Object, name));
-            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, null, messageHandler.Object, name));
-            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, messageFactory.Object, null, name));
-            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, null));
-            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, default(String)));
-            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManager.Object, messageFactory.Object, messageHandler.Object, String.Empty));
+            AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactoryMock.Object, requestDispatcherMock.Object, name));
+            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, null, requestDispatcherMock.Object, name));
+            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, messageFactoryMock.Object, null, name));
+            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, messageFactoryMock.Object, requestDispatcherMock.Object, null));
+            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, messageFactoryMock.Object, requestDispatcherMock.Object, default(String)));
+            AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, messageFactoryMock.Object, requestDispatcherMock.Object, String.Empty));
         }
 
 
@@ -60,16 +61,16 @@ namespace Smoke.Test
 		public void Server_NullMessage_NoException()
 		{
 			// Setup
-			var messageHandlerMock = new Mock<IMessageHandler>();
+			var requestDispatcherMock = new Mock<IRequestDispatcher>();
 			var messageFactoryMock = new Mock<IMessageFactory>();
 			var receiverManagerMock = new Mock<IReceiverManager>();
 
 			receiverManagerMock.Setup(m => m.Receive()).Returns(default(RequestTask));
-			messageHandlerMock.Setup(m => m.Handle(It.IsAny<Message>(), It.IsAny<IMessageFactory>())).Throws<Exception>();
+			requestDispatcherMock.Setup(m => m.Handle(It.IsAny<object>())).Throws<Exception>();
 			
             var cancellationTokenSource = new CancellationTokenSource();
 
-			var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, messageHandlerMock.Object, "TestServer");
+			var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, requestDispatcherMock.Object, "TestServer");
 
 			// Run
 			server.Start(cancellationTokenSource.Token);
@@ -77,7 +78,7 @@ namespace Smoke.Test
 
 			// Assert
 			receiverManagerMock.Verify(m => m.Receive(), Times.AtLeastOnce());
-			messageHandlerMock.Verify(m => m.Handle(It.IsAny<Message>(), It.IsAny<IMessageFactory>()), Times.Never);
+			requestDispatcherMock.Verify(m => m.Handle(It.IsAny<object>()), Times.Never);
 		}
 
 
@@ -85,29 +86,28 @@ namespace Smoke.Test
 		/// Test general server operation in a synchronous run
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="receiveObject"></param>
-        public void GenericSyncRunTest<T>(T receiveObject)
+		/// <param name="requestObject"></param>
+        public void GenericSyncRunTest<T>(T requestObject)
         {
             // Setup
-            var mockMessageHandler = new MockMessageHandler();
-            var messageFactoryMock = new Mock<IMessageFactory>();
+            var mockRequestDispatcher = new MockRequestDispatcher();
+            var messageFactory = new MessageFactory();      // The mock wouldn't return a non-null message
             var receiverManagerMock = new Mock<IReceiverManager>();
             var receiverMock = new Mock<IReceiver>();
             var name = "TestServer";
 
-            var message = new DataMessage<T>(receiveObject);
+            var requestMessage = new DataMessage<T>(requestObject);
             var cancellationTokenSource = new CancellationTokenSource();
             Action<Message> responseAction = m =>
             {
-                Assert.AreEqual(message, m);
+                Assert.AreEqual(requestMessage.Data, ((DataMessage<T>)m).Data);
                 cancellationTokenSource.Cancel();
             };
-            var requestTask = new RequestTask(message, responseAction);
+            var requestTask = new RequestTask(requestMessage, responseAction);
 
             receiverManagerMock.Setup(m => m.Receive()).Returns(requestTask);
 
-
-            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, mockMessageHandler, name);
+            var server = new Server(receiverManagerMock.Object, messageFactory, mockRequestDispatcher, name);
 
             Assert.IsFalse(server.Running);
 
@@ -129,7 +129,7 @@ namespace Smoke.Test
         public void GenericTaskRunTest<T>(T receiveObject)
         {
             // Setup
-            var mockMessageHandler = new MockMessageHandler();
+            var mockRequestDispatcher = new MockRequestDispatcher();
             var messageFactoryMock = new Mock<IMessageFactory>();
             var receiverManagerMock = new Mock<IReceiverManager>();
             var receiverMock = new Mock<IReceiver>();
@@ -141,7 +141,7 @@ namespace Smoke.Test
             var name = "TestServer";
 
 
-            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, mockMessageHandler, name);
+            var server = new Server(receiverManagerMock.Object, messageFactoryMock.Object, mockRequestDispatcher, name);
 
             // Run
             var task = server.Start(cancellationTokenSource.Token);

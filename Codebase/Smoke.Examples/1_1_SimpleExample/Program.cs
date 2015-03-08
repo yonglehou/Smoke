@@ -23,7 +23,7 @@ namespace _1_1_SimpleExample
 
                 // Setup a message handler and register a request handler
                 var messageHandler = 
-                    DelegateMessageHandler.Create()
+                    RequestDispatcher.Create()
                         .Register<RandomNumberRequest, RandomNumberResponse>(new RandomNumberRequestHandler());
 
                 // Create the server and client

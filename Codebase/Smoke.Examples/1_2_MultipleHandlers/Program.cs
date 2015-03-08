@@ -22,7 +22,7 @@ namespace _1_2_MultipleHandlers
 
                 // Setup a message handler and register two request handlers
                 var messageHandler =
-                    DelegateMessageHandler.Create()
+                    RequestDispatcher.Create()
                         .Register<EchoRequest, EchoResponse>(new EchoRequestHandler())
                         .Register<QuadraticRequest, QuadraticResponse>(new QuadraticRequestHandler());
 
