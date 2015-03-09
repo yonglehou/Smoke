@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Smoke.Test.Mocks
 {
+    //ncrunch: no coverage start
+
+
     public class MockRequestDispatcher : IRequestDispatcher
     {
         private IServer server;
@@ -27,4 +30,7 @@ namespace Smoke.Test.Mocks
             return request;
         }
     }
+
+
+    //ncrunch: no coverage end
 }

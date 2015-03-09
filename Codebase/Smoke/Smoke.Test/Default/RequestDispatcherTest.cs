@@ -41,7 +41,7 @@ namespace Smoke.Test.Defaults
         {
             // Setup
             var requestDispatcher = RequestDispatcher.Create()
-                                                               .Register<DateTime, DateTime>(d => d.AddDays(1));
+                                                     .Register<DateTime, DateTime>(d => d.AddDays(1));
 
             var dt = DateTime.Now;
 
@@ -54,13 +54,23 @@ namespace Smoke.Test.Defaults
 
 
 		[TestMethod]
-		public void RequestDispatcher_NullMessage()
+		public void RequestDispatcher_HandleNullMessage()
 		{
             // Setup
 			var requestDispatcher = RequestDispatcher.Create();
 
 			AssertException.Throws<InvalidOperationException>(() => requestDispatcher.Handle(null));
 		}
+
+
+        [TestMethod]
+        public void RequestDispatcher_HandlerNotRegistered()
+        {
+            // Setup
+            var requestDispatcher = RequestDispatcher.Create();
+
+            AssertException.Throws<InvalidOperationException>(() => requestDispatcher.Handle(DateTime.Now));
+        }
         
 
         [TestMethod]

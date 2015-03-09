@@ -31,6 +31,9 @@ namespace Smoke.Test
 
 			// Assert
             Assert.AreEqual(name, server.ServerInfo.Name);
+            Assert.AreEqual(requestDispatcherMock.Object, server.RequestDispatcher);
+            Assert.AreEqual(messageFactoryMock.Object, server.MessageFactory);
+            Assert.AreEqual(receiverManagerMock.Object, server.ReceiverManager);
 
             AssertException.Throws<ArgumentNullException>(() => new Server(null, messageFactoryMock.Object, requestDispatcherMock.Object, name));
             AssertException.Throws<ArgumentNullException>(() => new Server(receiverManagerMock.Object, null, requestDispatcherMock.Object, name));
